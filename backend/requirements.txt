@@ -1,0 +1,25 @@
+
+# backend/requirements.txt
+# Web framework
+flask
+flask-cors
+
+# Google Cloud SDKs
+google-cloud-bigquery
+google-cloud-monitoring
+google-cloud-core
+google-auth
+
+# AWS SDKs
+boto3
+botocore
+
+# Azure SDKs
+azure-identity
+azure-mgmt-costmanagement
+azure-mgmt-monitor
+azure-mgmt-resource
+
+# Utils
+python-dotenv
+
