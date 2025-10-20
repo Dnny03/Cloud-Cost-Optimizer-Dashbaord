@@ -4,6 +4,17 @@
 flask
 flask-cors
 
+# Authentication & Security
+PyJWT
+Werkzeug
+
+# Database (if using SQLAlchemy for user storage)
+SQLAlchemy
+Flask-SQLAlchemy
+
+# Environment variables
+python-dotenv
+
 # Google Cloud SDKs
 google-cloud-bigquery
 google-cloud-monitoring
@@ -19,7 +30,4 @@ azure-identity
 azure-mgmt-costmanagement
 azure-mgmt-monitor
 azure-mgmt-resource
-
-# Utils
-python-dotenv
 
