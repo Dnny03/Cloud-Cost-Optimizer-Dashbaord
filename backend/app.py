@@ -66,11 +66,12 @@ def _iso_local(dt_utc: datetime) -> str:
 # -----------------------------
 # Auth helpers
 # -----------------------------
-def issue_token(username: str) -> str:
-    # Create a signed JWT with subject + iat + exp
+def issue_token(user: User) -> str:
+    # Create a signed JWT with subject + role + iat + exp
     now = datetime.now(timezone.utc)
     payload = {
-        "sub": username,
+        "sub": user.username,
+        "role": user.role,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(hours=JWT_TTL_HOURS)).timestamp()),
     }
@@ -90,11 +91,22 @@ def auth_required(fn):
         auth = request.headers.get("Authorization", "")
         if not auth.startswith("Bearer "):
             return jsonify({"error": "Unauthorized"}), 401
+
         token = auth.split(" ", 1)[1].strip()
         payload = verify_token(token)
         if not payload:
             return jsonify({"error": "Unauthorized"}), 401
-        request.user = payload.get("sub")  # stash username on request
+
+        username = payload.get("sub")
+        if not username:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        # stash the full user object on request
+        request.user = user
         return fn(*args, **kwargs)
     return wrapper
 
@@ -118,7 +130,6 @@ def health():
 # -----------------------------
 # Auth routes (DB-backed)
 # -----------------------------
-@app.post("/api/auth/register")
 @app.post("/api/auth/register")
 def register():
     """
@@ -195,11 +206,11 @@ def login():
         # Issue JWT and return both UTC/local expirations
         now_utc = datetime.now(timezone.utc)
         exp_utc = now_utc + timedelta(hours=JWT_TTL_HOURS)
-        token = issue_token(username)
+        token = issue_token(user)
 
         return jsonify({
             "token": token,
-            "user": {"username": username},
+            "user": {"username": user.username, "role": user.role},
             "expires_at": exp_utc.isoformat(),         # UTC expiration
             "expires_at_local": _iso_local(exp_utc),   # client-local expiration
             "client_tz": _client_tz_name(),
@@ -210,8 +221,28 @@ def login():
 @app.get("/api/auth/me")
 @auth_required
 def me():
-    # Return current user from JWT
-    return jsonify({"user": {"username": getattr(request, "user", None)}})
+    user = getattr(request, "user", None)
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"user": {"username": user.username, "role": user.role}})
+
+def role_required(*roles):
+    """
+    Decorator for role-based access.
+    Usage:
+        @role_required("admin")
+        def some_route(): ...
+    """
+    def decorator(fn):
+        @wraps(fn)
+        @auth_required  # ensure authenticated first
+        def wrapper(*args, **kwargs):
+            user = getattr(request, "user", None)
+            if not user or user.role not in roles:
+                return jsonify({"error": "Forbidden"}), 403
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
 
 @app.post("/api/auth/logout")
 @auth_required
@@ -303,7 +334,7 @@ def reset_password():
 # Protected data routes
 # -----------------------------
 @app.route("/api/providers")
-@auth_required
+@role_required("admin")
 def get_providers():
     # List providers enabled via AuthManager config
     return jsonify(auth_manager.get_active_providers())
