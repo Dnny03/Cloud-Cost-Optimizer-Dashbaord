@@ -119,10 +119,13 @@ def health():
 # Auth routes (DB-backed)
 # -----------------------------
 @app.post("/api/auth/register")
+@app.post("/api/auth/register")
 def register():
     """
     Create a new user.
-    Body: {"username": "...", "password": "...", "email": optional}
+    Expects: {"username": "...", "password": "...", "email": optional, "role": optional}
+    - role can be "viewer" or "admin"
+    - security: only allow "admin" if no admin exists yet (bootstrap); otherwise force "viewer"
     """
     try:
         body = request.get_json(force=True) or {}
@@ -130,7 +133,17 @@ def register():
         password = (body.get("password") or "").strip()
         email = (body.get("email") or "").strip() or None
 
-        # Basic validation and uniqueness checks
+        # NEW: role handling
+        requested_role = (body.get("role") or "viewer").strip().lower()
+        if requested_role not in ("admin", "viewer"):
+            requested_role = "viewer"
+
+        # Security: only allow "admin" if this is the very first admin
+        has_admin = User.query.filter_by(role="admin").first() is not None
+        if requested_role == "admin" and has_admin:
+            # silently downgrade to viewer after first admin is created
+            requested_role = "viewer"
+
         if not username or not password:
             return jsonify({"error": "Username and password are required."}), 400
         if User.query.filter_by(username=username).first():
@@ -138,16 +151,24 @@ def register():
         if email and User.query.filter_by(email=email).first():
             return jsonify({"error": "Email already in use."}), 409
 
-        # Persist user
         user = User(
             username=username,
             email=email,
             password_hash=generate_password_hash(password),
+            role=requested_role,  # NEW
         )
         db.session.add(user)
         db.session.commit()
-        return jsonify({"ok": True, "message": "User registered successfully."}), 201
-    except Exception as e:
+
+        return jsonify({
+            "ok": True,
+            "message": "User registered successfully.",
+            "user": {
+                "username": user.username,
+                "role": user.role,
+            }
+        }), 201
+    except Exception:
         db.session.rollback()
         return jsonify({"error": "Registration failed. Please try again."}), 500
 

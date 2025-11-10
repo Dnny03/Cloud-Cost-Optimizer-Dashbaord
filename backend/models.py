@@ -26,6 +26,9 @@ class User(db.Model):
     # Hashed password (never store raw passwords)
     password_hash = db.Column(db.String(255), nullable=False)
 
+    #NEW: role field
+    role = db.Column(db.String(50), nullable=False, default="viewer")
+
     # Creation timestamp in UTC (timezone-aware)
     created_at = db.Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
