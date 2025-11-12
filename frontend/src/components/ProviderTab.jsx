@@ -41,7 +41,7 @@ export default function ProviderTab({ provider }) {
         <MetricsCard
           title="Active Services"
           value={mtdCosts?.length}
-          unit="services"
+          unit=" services"
           loading={costsLoading}
           icon="⚙️"
         />

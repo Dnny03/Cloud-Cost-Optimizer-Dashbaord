@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import SpendingPieChart from '../components/SpendingPieChart'
 import api from '../services/api';
 
 export default function OverviewTab() {
   const [summary, setSummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,6 +40,7 @@ export default function OverviewTab() {
           <div className="card-header">
             <span className="card-icon">💰</span>
             <h4>Total MTD Spend</h4>
+            <SpendingPieChart data ={summary} />
           </div>
           <div className="card-body">
             <div className="metric-value">
@@ -55,7 +57,7 @@ export default function OverviewTab() {
           <div className="card-body">
             <div className="metric-value">
               <span className="value">{activeProviders}</span>
-              <span className="unit">providers</span>
+              <span className="unit"> providers</span>
             </div>
           </div>
         </div>
