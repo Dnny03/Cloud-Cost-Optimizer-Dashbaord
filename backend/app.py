@@ -334,7 +334,7 @@ def reset_password():
 # Protected data routes
 # -----------------------------
 @app.route("/api/providers")
-@role_required("admin")
+@role_required("admin", "viewer")
 def get_providers():
     # List providers enabled via AuthManager config
     return jsonify(auth_manager.get_active_providers())
