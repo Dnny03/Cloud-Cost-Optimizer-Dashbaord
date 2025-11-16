@@ -414,8 +414,8 @@ Created by **Team Cloud** for CIS4951 - Cloud Computing course at Florida Intern
 ## 🔗 Resources
 
 - [Flask Documentation](https://flask.palletsprojects.com/)
-- [React Documentation](https://react.dev/)
-- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/learn)
+- [Vite Documentation](https://vite.dev/guide/)
 - [Recharts Documentation](https://recharts.org/)
 - [JWT.io](https://jwt.io/)
 
