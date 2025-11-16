@@ -1,39 +1,13 @@
-# backend/models.py
-from __future__ import annotations
+# backend/app/models/password_reset.py
+"""
+Password reset token model
+"""
 
 import secrets
 from datetime import datetime, timedelta, timezone
-
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime
 from sqlalchemy.sql import func
-
-db = SQLAlchemy()  # SQLAlchemy instance shared across the app
-
-
-class User(db.Model):
-    __tablename__ = "users"
-
-    # Primary key ID
-    id = db.Column(db.Integer, primary_key=True)
-
-    # Unique username required for login
-    username = db.Column(db.String(120), unique=True, index=True, nullable=False)
-
-    # Optional email (also unique if provided)
-    email = db.Column(db.String(255), unique=True, index=True, nullable=True)
-
-    # Hashed password (never store raw passwords)
-    password_hash = db.Column(db.String(255), nullable=False)
-
-    #NEW: role field
-    role = db.Column(db.String(50), nullable=False, default="viewer")
-
-    # Creation timestamp in UTC (timezone-aware)
-    created_at = db.Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-
-    def __repr__(self):
-        return f"<User {self.username}>"
+from . import db
 
 
 class PasswordResetToken(db.Model):
