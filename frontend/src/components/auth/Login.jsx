@@ -35,12 +35,14 @@ export default function Login() {
     const [role, setRole] = useState("viewer");
     const [password, setPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [resetToken, setResetToken] = useState("");
 
     // UI state - separate show/hide states for different password fields
     const [showPw, setShowPw] = useState(false);
     const [showRegPw, setShowRegPw] = useState(false);  // For registration password
     const [showNewPw, setShowNewPw] = useState(false);   // For new password in reset
+    const [showConfirmPw, setShowConfirmPw] = useState(false); // For confirm password
     const [loading, setLoading] = useState(false);
     const [notice, setNotice] = useState("");
     const [error, setError] = useState("");
@@ -65,20 +67,24 @@ export default function Login() {
             setEmail("");
             setRole("viewer");
             setNewPassword("");
+            setConfirmPassword("");
             setResetToken("");
         } else if (mode === "register") {
             setPassword("");
             setNewPassword("");
+            setConfirmPassword("");
             setResetToken("");
         } else if (mode === "forgot") {
             setPassword("");
             setNewPassword("");
+            setConfirmPassword("");
             setResetToken("");
             setRole("viewer");
         } else if (mode === "reset") {
             setUsername("");
             setEmail("");
             setPassword("");
+            setConfirmPassword("");
             setRole("viewer");
         }
     }, [mode]);
@@ -186,8 +192,9 @@ export default function Login() {
             const r = await api.forgotPassword({username, email});
             // In dev, backend returns the token; in prod this would be emailed
             if (r?.reset_token) {
-                setNotice(`Check your email for reset instructions. DEV token: ${r.reset_token}`);
+                // Don't show the token to user anymore - just set it silently
                 setResetToken(r.reset_token);
+                setNotice("Reset token received. Please enter your new password below.");
                 setMode("reset");
             } else {
                 setNotice("If the account exists, we've sent reset instructions to your email.");
@@ -204,8 +211,18 @@ export default function Login() {
         e.preventDefault();
         clear();
 
-        if (!resetToken || !newPassword) {
-            setError("Token and new password are required.");
+        if (!resetToken) {
+            setError("No reset token found. Please request a new password reset.");
+            return;
+        }
+
+        if (!newPassword || !confirmPassword) {
+            setError("Please enter and confirm your new password.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setError("Passwords do not match.");
             return;
         }
 
@@ -222,6 +239,7 @@ export default function Login() {
             // Clear sensitive fields
             setPassword("");
             setNewPassword("");
+            setConfirmPassword("");
             setResetToken("");
         } catch (err) {
             setError(err.message || "Reset failed. Token may be invalid or expired.");
@@ -235,7 +253,6 @@ export default function Login() {
         <div className="auth-header">
             <div className="logo-dot" role="img" aria-label="Cloud Cost Optimizer Logo"/>
             <h1>Cloud Cost Optimizer</h1>
-            <p>Sign in to your dashboard</p>
         </div>
     );
 
@@ -465,7 +482,14 @@ export default function Login() {
                         <div className="auth-links">
                             <button
                                 type="button"
-                                onClick={() => setMode("reset")}
+                                onClick={() => {
+                                    // Allow manual token entry as backup
+                                    const token = prompt("If you have a reset token, enter it here:");
+                                    if (token) {
+                                        setResetToken(token);
+                                        setMode("reset");
+                                    }
+                                }}
                                 aria-label="I have a reset token"
                             >
                                 I already have a token
@@ -484,20 +508,13 @@ export default function Login() {
                 {/* ----- Reset-password form ----- */}
                 {mode === "reset" && (
                     <form onSubmit={onReset} className="auth-form" noValidate>
-                        <label className="auth-label">
-                            Reset Token
-                            <input
-                                className="auth-input"
-                                type="text"
-                                value={resetToken}
-                                onChange={(e) => setResetToken(e.target.value)}
-                                placeholder="Paste token here"
-                                autoComplete="off"
-                                autoFocus
-                                required
-                                aria-required="true"
-                            />
-                        </label>
+                        {/* Hidden token field - not shown to user */}
+                        <input
+                            type="hidden"
+                            value={resetToken}
+                        />
+
+                        <p>Enter your new password below:</p>
 
                         <label className="auth-label">
                             New Password
@@ -509,6 +526,7 @@ export default function Login() {
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="••••••••"
                                     autoComplete="new-password"
+                                    autoFocus
                                     required
                                     minLength={6}
                                     aria-required="true"
@@ -524,9 +542,42 @@ export default function Login() {
                             </div>
                         </label>
 
+                        <label className="auth-label">
+                            Confirm Password
+                            <div className="pw-field">
+                                <input
+                                    className="auth-input"
+                                    type={showConfirmPw ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    autoComplete="new-password"
+                                    required
+                                    minLength={6}
+                                    aria-required="true"
+                                    aria-invalid={confirmPassword && newPassword !== confirmPassword ? "true" : "false"}
+                                />
+                                <button
+                                    type="button"
+                                    className="pw-toggle"
+                                    onClick={() => setShowConfirmPw((v) => !v)}
+                                    aria-label={showConfirmPw ? "Hide password" : "Show password"}
+                                >
+                                    {showConfirmPw ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        </label>
+
+                        {/* Real-time password match feedback */}
+                        {confirmPassword && newPassword !== confirmPassword && (
+                            <div style={{color: '#ff6b6b', fontSize: '0.875rem', marginTop: '-0.5rem'}}>
+                                Passwords do not match
+                            </div>
+                        )}
+
                         <button
                             className="auth-button"
-                            disabled={loading}
+                            disabled={loading || (confirmPassword && newPassword !== confirmPassword)}
                             type="submit"
                             aria-busy={loading}
                         >
