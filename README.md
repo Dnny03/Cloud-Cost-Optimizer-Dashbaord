@@ -405,11 +405,14 @@ This project is licensed under the MIT License.
 
 ## 👥 Team
 
-Created by **Team Cloud** for CIS4951 - Cloud Computing course at Florida International University.
+Created by **Team Cloud** for CIS4951 - Capstone II course at Florida International University.
 
 ### Contributors
-- Yasser - Full Stack Development
-- Team Cloud Members - Design & Testing
+- Daniel Gonzalez - Project Leader / Full Stack Developer
+- Sandy Aguilar - Full Stack Developer
+- Isabel Ruiz - Full Stack Developer
+- Favio Valdes - Full Stack Developer
+- Yasser Blanco Montequin- Full Stack Developer
 
 ## 🔗 Resources
 
