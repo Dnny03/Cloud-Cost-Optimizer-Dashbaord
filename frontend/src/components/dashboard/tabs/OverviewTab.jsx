@@ -163,44 +163,52 @@ export default function OverviewTab() {
           </div>
         ) : (
           <div className="metrics-grid">
-            {summary.map((provider) => {
-              if (!provider || !provider.provider) return null;
+            {/* Sort providers to match pie chart order: AWS, AZURE, GCP */}
+            {[...summary]
+              .sort((a, b) => {
+                const order = { aws: 1, azure: 2, gcp: 3 };
+                const aKey = a.provider?.toLowerCase();
+                const bKey = b.provider?.toLowerCase();
+                return (order[aKey] || 999) - (order[bKey] || 999);
+              })
+              .map((provider) => {
+                if (!provider || !provider.provider) return null;
 
-              return (
-                <div key={provider.provider} className="metrics-card">
-                  <div className="card-header">
-                    <span className="card-icon" aria-hidden="true">
-                      {getProviderIcon(provider.provider)}
-                    </span>
-                    <h4>{provider.provider.toUpperCase()}</h4>
-                  </div>
-                  <div className="card-body">
-                    {provider.status === 'active' ? (
-                      <>
-                        <div className="metric-value">
-                          <span className="value">
-                            ${typeof provider.mtd_cost === 'number'
-                              ? provider.mtd_cost.toFixed(2)
-                              : '0.00'}
-                          </span>
+                return (
+                  <div key={provider.provider} className="metrics-card">
+                    <div className="card-header">
+                      <span className="card-icon" aria-hidden="true">
+                        {getProviderIcon(provider.provider)}
+                      </span>
+                      <h4>{provider.provider.toUpperCase()}</h4>
+                    </div>
+                    <div className="card-body">
+                      {provider.status === 'active' ? (
+                        <>
+                          <div className="metric-value">
+                            <span className="value">
+                              ${typeof provider.mtd_cost === 'number'
+                                ? provider.mtd_cost.toFixed(2)
+                                : '0.00'}
+                            </span>
+                          </div>
+                          <div style={{
+                            fontSize: '12px',
+                            color: '#94a3b8',
+                            marginTop: '8px'
+                          }}>
+                            MTD Cost
+                          </div>
+                        </>
+                      ) : (
+                        <div className="error" style={{ fontSize: '14px', color: '#ef4444' }}>
+                          {provider.error || 'Not configured'}
                         </div>
-                        <div style={{
-                          fontSize: '12px',
-                          color: '#94a3b8',
-                          marginTop: '8px'
-                        }}>
-                          MTD Cost
-                        </div>
-                      </>
-                    ) : (
-                      <div className="error" style={{ fontSize: '14px', color: '#ef4444' }}>
-                        {provider.error || 'Not configured'}
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         )}
       </div>
