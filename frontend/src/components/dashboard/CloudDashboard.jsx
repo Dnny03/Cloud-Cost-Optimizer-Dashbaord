@@ -151,21 +151,27 @@ export default function CloudDashboard() {
         </button>
 
         {/* Dynamically render a tab for each configured cloud provider */}
-        {providers.map((provider) => (
-          <button
-            key={provider.name}
-            className={`tab-button ${activeTab === provider.name ? 'active' : ''}`}
-            onClick={() => setActiveTab(provider.name)}
-            role="tab"
-            aria-selected={activeTab === provider.name}
-            aria-controls={`${provider.name}-panel`}
-          >
-            <span className="tab-icon" aria-hidden="true">
-              {getProviderIcon(provider.name)}
-            </span>
-            <span className="tab-label">{provider.display_name}</span>
-          </button>
-        ))}
+        {/* Sort providers to match pie chart order: AWS, AZURE, GCP */}
+        {[...providers]
+          .sort((a, b) => {
+            const order = { aws: 1, azure: 2, gcp: 3 };
+            return (order[a.name] || 999) - (order[b.name] || 999);
+          })
+          .map((provider) => (
+            <button
+              key={provider.name}
+              className={`tab-button ${activeTab === provider.name ? 'active' : ''}`}
+              onClick={() => setActiveTab(provider.name)}
+              role="tab"
+              aria-selected={activeTab === provider.name}
+              aria-controls={`${provider.name}-panel`}
+            >
+              <span className="tab-icon" aria-hidden="true">
+                {getProviderIcon(provider.name)}
+              </span>
+              <span className="tab-label">{provider.display_name}</span>
+            </button>
+          ))}
       </nav>
 
       {/* ====== Tab Content ====== */}
