@@ -1,7 +1,13 @@
 import React from 'react';
 import {PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer} from 'recharts';
 
-const COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'];
+// Map provider names to specific colors matching the icons in OverviewTab.jsx
+// GCP: ☁️ (cloud - gray), AWS: 🟠 (orange circle), AZURE: 🔷 (blue diamond)
+const PROVIDER_COLORS = {
+    'GCP': '#94a3b8',    // Gray (matches cloud ☁️)
+    'AWS': '#f59e0b',    // Orange (matches orange circle 🟠)
+    'AZURE': '#3b82f6'   // Blue (matches blue diamond 🔷)
+};
 
 export default function SpendingPieChart({data}) {
     if (!data || data.length === 0) {
@@ -32,15 +38,15 @@ export default function SpendingPieChart({data}) {
                         dataKey="value"
                         nameKey="name"
                         cx="50%"
-                        cy="45%"  // Move the pie chart up (was 50%)
-                        outerRadius={105}  // Make it bigger (was 100)
-                        label={({percent}) => `${(percent * 100).toFixed(0)}%`}  // Just show percentage
-                        labelLine={false}  // Remove the connecting lines
+                        cy="45%"
+                        outerRadius={105}
+                        label={({percent}) => `${(percent * 100).toFixed(0)}%`}
+                        labelLine={false}
                     >
-                        {displayData.map((_, index) => (
+                        {displayData.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
-                                fill={total === 0 ? '#64748b' : COLORS[index % COLORS.length]}
+                                fill={total === 0 ? '#64748b' : (PROVIDER_COLORS[entry.name] || '#8b5cf6')}
                             />
                         ))}
                     </Pie>
