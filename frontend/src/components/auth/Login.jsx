@@ -1,7 +1,11 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../services/api.js";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../styles/login.css";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
+import ResetPasswordForm from "./ResetPasswordForm";
 
 // Safe localStorage wrapper
 const storage = {
@@ -189,7 +193,7 @@ export default function Login() {
 
         setLoading(true);
         try {
-            const r = await api.forgotPassword({username, email});
+            const r = await api.forgotPassword({ username, email });
             // In dev, backend returns the token; in prod this would be emailed
             if (r?.reset_token) {
                 // Don't show the token to user anymore - just set it silently
@@ -251,7 +255,7 @@ export default function Login() {
     // Static header section
     const Header = (
         <div className="auth-header">
-            <div className="logo-dot" role="img" aria-label="Cloud Cost Optimizer Logo"/>
+            <div className="logo-dot" role="img" aria-label="Cloud Cost Optimizer Logo" />
             <h1>Cloud Cost Optimizer</h1>
         </div>
     );
@@ -273,327 +277,72 @@ export default function Login() {
                     </div>
                 )}
 
-                {/* ----- Login form ----- */}
+                {/* Render appropriate form based on mode */}
                 {mode === "login" && (
-                    <form onSubmit={onLogin} className="auth-form" noValidate>
-                        <label className="auth-label">
-                            Username
-                            <input
-                                className="auth-input"
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Your username"
-                                autoComplete="username"
-                                autoFocus
-                                required
-                                minLength={3}
-                                aria-required="true"
-                                aria-invalid={error && !username ? "true" : "false"}
-                            />
-                        </label>
-
-                        <label className="auth-label">
-                            Password
-                            <div className="pw-field">
-                                <input
-                                    className="auth-input"
-                                    type={showPw ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    autoComplete="current-password"
-                                    required
-                                    minLength={6}
-                                    aria-required="true"
-                                    aria-invalid={error && !password ? "true" : "false"}
-                                />
-                                {/* Show/Hide password toggle */}
-                                <button
-                                    type="button"
-                                    className="pw-toggle"
-                                    onClick={() => setShowPw((v) => !v)}
-                                    aria-label={showPw ? "Hide password" : "Show password"}
-                                >
-                                    {showPw ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        </label>
-
-                        <button
-                            className="auth-button"
-                            disabled={loading}
-                            type="submit"
-                            aria-busy={loading}
-                        >
-                            {loading ? "Signing in…" : "Sign In"}
-                        </button>
-
-                        {/* Quick links for other flows */}
-                        <div className="auth-links">
-                            <button
-                                type="button"
-                                onClick={() => setMode("register")}
-                                aria-label="Create new account"
-                            >
-                                Create account
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode("forgot")}
-                                aria-label="Reset forgotten password"
-                            >
-                                Forgot password?
-                            </button>
-                        </div>
-                    </form>
+                    <LoginForm
+                        username={username}
+                        setUsername={setUsername}
+                        password={password}
+                        setPassword={setPassword}
+                        showPw={showPw}
+                        setShowPw={setShowPw}
+                        loading={loading}
+                        error={error}
+                        onSubmit={onLogin}
+                        onSwitchToRegister={() => setMode("register")}
+                        onSwitchToForgot={() => setMode("forgot")}
+                    />
                 )}
 
-                {/* ----- Registration form ----- */}
                 {mode === "register" && (
-                    <form onSubmit={onRegister} className="auth-form" noValidate>
-                        <label className="auth-label">
-                            Username
-                            <input
-                                className="auth-input"
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Choose a username"
-                                autoComplete="username"
-                                autoFocus
-                                required
-                                minLength={3}
-                                aria-required="true"
-                            />
-                        </label>
-
-                        <label className="auth-label">
-                            Email (optional)
-                            <input
-                                className="auth-input"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@company.com"
-                                autoComplete="email"
-                                aria-invalid={email && !validateEmail(email) ? "true" : "false"}
-                            />
-                        </label>
-
-                        {/* Role selector */}
-                        <label className="auth-label">
-                            Role
-                            <select
-                                className="auth-input"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                aria-label="Select user role"
-                            >
-                                <option value="viewer">Viewer</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </label>
-
-                        <label className="auth-label">
-                            Password
-                            <div className="pw-field">
-                                <input
-                                    className="auth-input"
-                                    type={showRegPw ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    autoComplete="new-password"
-                                    required
-                                    minLength={6}
-                                    aria-required="true"
-                                />
-                                <button
-                                    type="button"
-                                    className="pw-toggle"
-                                    onClick={() => setShowRegPw((v) => !v)}
-                                    aria-label={showRegPw ? "Hide password" : "Show password"}
-                                >
-                                    {showRegPw ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        </label>
-
-                        <button
-                            className="auth-button"
-                            disabled={loading}
-                            type="submit"
-                            aria-busy={loading}
-                        >
-                            {loading ? "Creating…" : "Create Account"}
-                        </button>
-
-                        <div className="auth-links">
-                            <button
-                                type="button"
-                                onClick={() => setMode("login")}
-                                aria-label="Return to sign in"
-                            >
-                                Back to sign in
-                            </button>
-                        </div>
-                    </form>
+                    <RegisterForm
+                        username={username}
+                        setUsername={setUsername}
+                        email={email}
+                        setEmail={setEmail}
+                        role={role}
+                        setRole={setRole}
+                        password={password}
+                        setPassword={setPassword}
+                        showRegPw={showRegPw}
+                        setShowRegPw={setShowRegPw}
+                        loading={loading}
+                        error={error}
+                        validateEmail={validateEmail}
+                        onSubmit={onRegister}
+                        onSwitchToLogin={() => setMode("login")}
+                    />
                 )}
 
-                {/* ----- Forgot-password form ----- */}
                 {mode === "forgot" && (
-                    <form onSubmit={onForgot} className="auth-form" noValidate>
-                        <p>Enter your username or email to receive reset instructions.</p>
-                        <label className="auth-label">
-                            Username
-                            <input
-                                className="auth-input"
-                                type="text"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Your username"
-                                autoComplete="username"
-                                autoFocus
-                            />
-                        </label>
-
-                        <label className="auth-label">
-                            Or Email
-                            <input
-                                className="auth-input"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@company.com"
-                                autoComplete="email"
-                            />
-                        </label>
-
-                        <button
-                            className="auth-button"
-                            disabled={loading}
-                            type="submit"
-                            aria-busy={loading}
-                        >
-                            {loading ? "Sending…" : "Send Reset"}
-                        </button>
-
-                        <div className="auth-links">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    // Allow manual token entry as backup
-                                    const token = prompt("If you have a reset token, enter it here:");
-                                    if (token) {
-                                        setResetToken(token);
-                                        setMode("reset");
-                                    }
-                                }}
-                                aria-label="I have a reset token"
-                            >
-                                I already have a token
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode("login")}
-                                aria-label="Return to sign in"
-                            >
-                                Back to sign in
-                            </button>
-                        </div>
-                    </form>
+                    <ForgotPasswordForm
+                        username={username}
+                        setUsername={setUsername}
+                        email={email}
+                        setEmail={setEmail}
+                        loading={loading}
+                        onSubmit={onForgot}
+                        setResetToken={setResetToken}
+                        setMode={setMode}
+                        onSwitchToLogin={() => setMode("login")}
+                    />
                 )}
 
-                {/* ----- Reset-password form ----- */}
                 {mode === "reset" && (
-                    <form onSubmit={onReset} className="auth-form" noValidate>
-                        {/* Hidden token field - not shown to user */}
-                        <input
-                            type="hidden"
-                            value={resetToken}
-                        />
-
-                        <p>Enter your new password below:</p>
-
-                        <label className="auth-label">
-                            New Password
-                            <div className="pw-field">
-                                <input
-                                    className="auth-input"
-                                    type={showNewPw ? "text" : "password"}
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    autoComplete="new-password"
-                                    autoFocus
-                                    required
-                                    minLength={6}
-                                    aria-required="true"
-                                />
-                                <button
-                                    type="button"
-                                    className="pw-toggle"
-                                    onClick={() => setShowNewPw((v) => !v)}
-                                    aria-label={showNewPw ? "Hide password" : "Show password"}
-                                >
-                                    {showNewPw ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        </label>
-
-                        <label className="auth-label">
-                            Confirm Password
-                            <div className="pw-field">
-                                <input
-                                    className="auth-input"
-                                    type={showConfirmPw ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="••••••••"
-                                    autoComplete="new-password"
-                                    required
-                                    minLength={6}
-                                    aria-required="true"
-                                    aria-invalid={confirmPassword && newPassword !== confirmPassword ? "true" : "false"}
-                                />
-                                <button
-                                    type="button"
-                                    className="pw-toggle"
-                                    onClick={() => setShowConfirmPw((v) => !v)}
-                                    aria-label={showConfirmPw ? "Hide password" : "Show password"}
-                                >
-                                    {showConfirmPw ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        </label>
-
-                        {/* Real-time password match feedback */}
-                        {confirmPassword && newPassword !== confirmPassword && (
-                            <div style={{color: '#ff6b6b', fontSize: '0.875rem', marginTop: '-0.5rem'}}>
-                                Passwords do not match
-                            </div>
-                        )}
-
-                        <button
-                            className="auth-button"
-                            disabled={loading || (confirmPassword && newPassword !== confirmPassword)}
-                            type="submit"
-                            aria-busy={loading}
-                        >
-                            {loading ? "Updating…" : "Update Password"}
-                        </button>
-
-                        <div className="auth-links">
-                            <button
-                                type="button"
-                                onClick={() => setMode("login")}
-                                aria-label="Return to sign in"
-                            >
-                                Back to sign in
-                            </button>
-                        </div>
-                    </form>
+                    <ResetPasswordForm
+                        resetToken={resetToken}
+                        newPassword={newPassword}
+                        setNewPassword={setNewPassword}
+                        confirmPassword={confirmPassword}
+                        setConfirmPassword={setConfirmPassword}
+                        showNewPw={showNewPw}
+                        setShowNewPw={setShowNewPw}
+                        showConfirmPw={showConfirmPw}
+                        setShowConfirmPw={setShowConfirmPw}
+                        loading={loading}
+                        onSubmit={onReset}
+                        onSwitchToLogin={() => setMode("login")}
+                    />
                 )}
 
                 {/* Footer */}
