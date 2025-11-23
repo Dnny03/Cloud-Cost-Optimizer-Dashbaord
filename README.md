@@ -10,6 +10,7 @@ A full-stack multi-cloud cost monitoring dashboard that provides real-time insig
 - **Password reset functionality** with token-based recovery
 - **Auto-logout on 401 responses** for expired sessions
 - **Protected routes** that require authentication
+- **Modular auth components** for better maintainability
 
 ### Dashboard Capabilities
 - **Multi-cloud support** for AWS, GCP, and Azure
@@ -17,6 +18,8 @@ A full-stack multi-cloud cost monitoring dashboard that provides real-time insig
 - **Month-to-date cost tracking** by service and project
 - **Interactive spending visualizations** using Recharts
 - **Provider-specific dashboards** with detailed breakdowns
+- **Consistent provider ordering** across all dashboard sections (AWS → AZURE → GCP)
+- **Color-coded pie chart** matching provider icons
 
 ## 📁 Complete Project Structure
 
@@ -56,8 +59,11 @@ Cloud-Cost-Optimizer-Dashboard/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── auth/
-│   │   │   │   ├── Login.jsx          # Authentication UI
-│   │   │   │   └── login.css          # Auth styles
+│   │   │   │   ├── Login.jsx              # Main auth container
+│   │   │   │   ├── LoginForm.jsx          # Login form component
+│   │   │   │   ├── RegisterForm.jsx       # Registration form component
+│   │   │   │   ├── ForgotPasswordForm.jsx # Forgot password form
+│   │   │   │   └── ResetPasswordForm.jsx  # Reset password form
 │   │   │   ├── dashboard/
 │   │   │   │   ├── CloudDashboard.jsx # Main dashboard container
 │   │   │   │   ├── CloudDashboard.css # Dashboard styles
@@ -177,10 +183,11 @@ Frontend will run on `http://localhost:5173`
 
 ### Dashboard Features
 - **Overview Tab**: Total costs across all providers
-- **Provider Tabs**: Individual AWS, Azure, GCP metrics
+- **Provider Tabs**: Individual AWS, Azure, GCP metrics (displayed in consistent order)
 - **Auto-refresh**: Data updates every 30 seconds
-- **Pie Chart**: Visual spending breakdown (percentages only)
+- **Pie Chart**: Visual spending breakdown with color-coded providers
 - **Cost Tables**: Detailed service costs
+- **Provider Cards**: Individual provider costs in the Overview tab
 
 ## 🔧 Configuration
 
@@ -223,7 +230,7 @@ AZURE_CLIENT_SECRET=your-client-secret
 
 **Important**: Never commit real credentials to version control. The `.env` file should be in `.gitignore`.
 
-## 🔌 API Endpoints
+## 📌 API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Create new account
@@ -359,6 +366,49 @@ When `USE_MOCK_DATA=true` (default), the app shows:
 - Simulated real-time metrics
 - Perfect for demos and development
 
+## 🎨 UI/UX Design
+
+### Provider Color Scheme
+Consistent colors are used throughout the dashboard:
+- **AWS**: Orange (#f59e0b) with 🟠 icon
+- **Azure**: Blue (#3b82f6) with 🔷 icon
+- **GCP**: Gray (#94a3b8) with ☁️ icon
+
+### Provider Ordering
+All dashboard sections display providers in consistent order:
+- Navigation tabs: AWS → AZURE → GCP
+- Pie chart legend: AWS → AZURE → GCP
+- Provider cards: AWS → AZURE → GCP
+
+## 🏗️ Component Architecture
+
+### Authentication Components
+The authentication system uses a modular component architecture:
+
+```
+src/components/auth/
+├── Login.jsx              # Main container (state management & routing)
+├── LoginForm.jsx          # Login form UI
+├── RegisterForm.jsx       # Registration form UI
+├── ForgotPasswordForm.jsx # Forgot password form UI
+└── ResetPasswordForm.jsx  # Reset password form UI
+```
+
+**Benefits:**
+- Better code organization and separation of concerns
+- Easier to maintain and debug individual forms
+- Enables independent testing of each form
+- Facilitates parallel development
+
+### Dashboard Components
+```
+src/components/dashboard/
+├── CloudDashboard.jsx     # Main dashboard with tab navigation
+└── tabs/
+    ├── OverviewTab.jsx    # Multi-cloud overview with pie chart
+    └── ProviderTab.jsx    # Individual provider details
+```
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -372,6 +422,8 @@ When `USE_MOCK_DATA=true` (default), the app shows:
 - Test with real credentials only in secure environment
 - Follow existing code structure
 - Update documentation for new features
+- Maintain consistent provider ordering (AWS → AZURE → GCP)
+- Use the established color scheme for providers
 
 ## 📝 Dependencies
 
