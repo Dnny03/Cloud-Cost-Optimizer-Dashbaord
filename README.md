@@ -30,27 +30,30 @@ Cloud-Cost-Optimizer-Dashboard/
 │   │   ├── api/
 │   │   │   ├── __init__.py
 │   │   │   ├── auth_routes.py         # Authentication endpoints
-│   │   │   ├── provider_routes.py     # Cloud provider endpoints
-│   │   │   └── health_routes.py       # Health check endpoints
+│   │   │   ├── health_routes.py       # Health check endpoints
+│   │   │   └── provider_routes.py     # Cloud provider endpoints
 │   │   ├── models/
 │   │   │   ├── __init__.py
-│   │   │   ├── users.py               # User model
-│   │   │   └── password_reset.py      # Password reset tokens
-│   │   └── services/
-│   │       ├── auth/
-│   │       │   ├── __init__.py
-│   │       │   └── auth_manager.py    # Authentication logic
-│   │       └── providers/
-│   │           ├── __init__.py
-│   │           ├── aws_provider.py    # AWS integration
-│   │           ├── gcp_provider.py    # GCP integration
-│   │           ├── azure_provider.py  # Azure integration
-│   │           └── cloud_factory.py   # Provider factory pattern
+│   │   │   ├── password_reset.py      # Password reset tokens
+│   │   │   └── users.py               # User model
+│   │   ├── services/
+│   │   │   ├── auth/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── auth_manager.py    # Authentication logic
+│   │   │   ├── providers/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── aws_provider.py    # AWS integration
+│   │   │   │   ├── azure_provider.py  # Azure integration
+│   │   │   │   ├── base_provider.py   # Abstract base provider class
+│   │   │   │   ├── cloud_factory.py   # Provider factory pattern
+│   │   │   │   ├── gcp_provider.py    # GCP integration
+│   │   │   │   └── mock_provider.py   # Mock data for development/demo
+│   │   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   └── config.py                  # Configuration settings
 │   ├── instance/
 │   │   └── app.db                     # SQLite database (auto-created)
-│   ├── .env                           # Configuration (mock data enabled)
 │   ├── app.py                         # Flask application entry
-│   ├── config.py                      # Configuration settings
 │   └── requirements.txt               # Python dependencies
 │
 ├── frontend/
@@ -59,39 +62,41 @@ Cloud-Cost-Optimizer-Dashboard/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── auth/
+│   │   │   │   ├── ForgotPasswordForm.jsx # Forgot password form
 │   │   │   │   ├── Login.jsx              # Main auth container
 │   │   │   │   ├── LoginForm.jsx          # Login form component
 │   │   │   │   ├── RegisterForm.jsx       # Registration form component
-│   │   │   │   ├── ForgotPasswordForm.jsx # Forgot password form
 │   │   │   │   └── ResetPasswordForm.jsx  # Reset password form
-│   │   │   ├── dashboard/
-│   │   │   │   ├── CloudDashboard.jsx # Main dashboard container
-│   │   │   │   ├── CloudDashboard.css # Dashboard styles
-│   │   │   │   └── tabs/
-│   │   │   │       ├── OverviewTab.jsx    # Multi-cloud overview
-│   │   │   │       └── ProviderTab.jsx    # Provider-specific view
-│   │   │   ├── charts/
-│   │   │   │   └── SpendingPieChart.jsx   # Pie chart visualization
-│   │   │   └── common/
-│   │   │       ├── MetricsCard.jsx        # Reusable metric card
-│   │   │       └── CostsTable.jsx         # Cost breakdown table
+│   │   │   ├── common/
+│   │   │   │   ├── CostsTable.jsx         # Cost breakdown table
+│   │   │   │   └── MetricsCard.jsx        # Reusable metric card
+│   │   │   └── dashboard/
+│   │   │       ├── charts/
+│   │   │       │   └── SpendingPieChart.jsx   # Pie chart visualization
+│   │   │       ├── tabs/
+│   │   │       │   ├── OverviewTab.jsx    # Multi-cloud overview
+│   │   │       │   └── ProviderTab.jsx    # Provider-specific view
+│   │   │       └── CloudDashboard.jsx     # Main dashboard container
 │   │   ├── hooks/
 │   │   │   └── useCloudData.js        # Custom React hooks
 │   │   ├── services/
 │   │   │   └── api.js                 # API client with auth
 │   │   ├── styles/
 │   │   │   ├── CloudDashboard.css     # Dashboard styles
+│   │   │   ├── global.css             # Global application styles
 │   │   │   └── login.css              # Login styles
 │   │   ├── App.jsx                    # Main app with routing
 │   │   └── main.jsx                   # React entry point
+│   ├── eslint.config.js               # ESLint configuration
+│   ├── index.html                     # HTML entry point
+│   ├── package-lock.json              # Dependency lock file
 │   ├── package.json                   # Node dependencies
-│   ├── package-lock.json             # Dependency lock file
-│   ├── vite.config.js                # Vite configuration
-│   ├── eslint.config.js              # ESLint configuration
-│   └── index.html                    # HTML entry point
+│   └── vite.config.js                 # Vite configuration
 │
 └── README.md                          # This file
 ```
+
+**21 directories, 47 files**
 
 ## 🛠️ Prerequisites
 
@@ -404,6 +409,8 @@ src/components/auth/
 ```
 src/components/dashboard/
 ├── CloudDashboard.jsx     # Main dashboard with tab navigation
+├── charts/
+│   └── SpendingPieChart.jsx   # Pie chart for spending distribution
 └── tabs/
     ├── OverviewTab.jsx    # Multi-cloud overview with pie chart
     └── ProviderTab.jsx    # Individual provider details
@@ -464,7 +471,13 @@ Created by **Team Cloud** for CIS4951 - Capstone II course at Florida Internatio
 - Sandy Aguilar - Full Stack Developer
 - Isabel Ruiz - Full Stack Developer
 - Favio Valdes - Full Stack Developer
-- Yasser Blanco Montequin- Full Stack Developer
+- Yasser Blanco Montequin - Full Stack Developer
+
+## 🎓 Showcase
+
+**Date:** December 5th, 2024  
+**Time:** 1:00 PM - 5:00 PM ET  
+**Location:** Innovation 1, Florida International University
 
 ## 🔗 Resources
 
