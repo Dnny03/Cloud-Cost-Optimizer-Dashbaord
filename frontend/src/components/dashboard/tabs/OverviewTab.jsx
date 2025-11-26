@@ -185,9 +185,7 @@ export default function OverviewTab() {
             </div>
 
             {/* Services Breakdown */}
-            <div className="costs-section">
-                <ServicesBreakdown/>
-            </div>
+            <ServicesBreakdown/>
         </div>
     );
 }
