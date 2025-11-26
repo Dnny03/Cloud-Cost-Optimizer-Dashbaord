@@ -130,9 +130,9 @@
   font-size: 1.125rem;
 }
 
-/* Tab Content */
 .tab-content {
   margin-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .tab-panel {
