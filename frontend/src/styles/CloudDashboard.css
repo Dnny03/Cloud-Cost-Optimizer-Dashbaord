@@ -1259,6 +1259,7 @@
     padding: 20px 24px;
     background: #f8fafc;
     border-radius: 8px;
+    box-shadow: var(--shadow-sm);
 }
 
 .summary-stat {
