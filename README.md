@@ -1,6 +1,6 @@
 # Cloud Cost Optimizer Dashboard
 
-A full-stack multi-cloud cost monitoring dashboard that provides real-time insights into AWS, GCP, and Azure spending with authentication and role-based access control.
+A full-stack multi-cloud cost monitoring dashboard that provides real-time insights into AWS, GCP, and Azure spending with authentication, role-based access control, anomaly detection, cost forecasting, and optimization recommendations.
 
 ## 🚀 Features
 
@@ -21,6 +21,14 @@ A full-stack multi-cloud cost monitoring dashboard that provides real-time insig
 - **Consistent provider ordering** across all dashboard sections (AWS → AZURE → GCP)
 - **Color-coded pie chart** matching provider icons
 
+### Cost Intelligence Features
+- **Anomaly Detection** - Identifies unusual spending patterns with severity levels and recommendations
+- **Cost Forecasting** - 7-day cost predictions with confidence intervals and trend analysis
+- **Optimization Recommendations** - Actionable suggestions with potential savings estimates
+- **Cost Alerts** - Real-time threshold notifications with severity-based filtering
+- **Budget Tracking** - Visual budget vs actual spending with projections and at-risk indicators
+- **Services Breakdown** - Detailed cost analysis by category with expandable service lists
+
 ## 📁 Complete Project Structure
 
 ```
@@ -31,7 +39,7 @@ Cloud-Cost-Optimizer-Dashboard/
 │   │   │   ├── __init__.py
 │   │   │   ├── auth_routes.py         # Authentication endpoints
 │   │   │   ├── health_routes.py       # Health check endpoints
-│   │   │   └── provider_routes.py     # Cloud provider endpoints
+│   │   │   └── provider_routes.py     # Cloud provider endpoints (includes new feature endpoints)
 │   │   ├── models/
 │   │   │   ├── __init__.py
 │   │   │   ├── password_reset.py      # Password reset tokens
@@ -47,7 +55,7 @@ Cloud-Cost-Optimizer-Dashboard/
 │   │   │   │   ├── base_provider.py   # Abstract base provider class
 │   │   │   │   ├── cloud_factory.py   # Provider factory pattern
 │   │   │   │   ├── gcp_provider.py    # GCP integration
-│   │   │   │   └── mock_provider.py   # Mock data for development/demo
+│   │   │   │   └── mock_provider.py   # Mock data for development/demo (140+ services)
 │   │   │   └── __init__.py
 │   │   ├── __init__.py
 │   │   └── config.py                  # Configuration settings
@@ -68,19 +76,27 @@ Cloud-Cost-Optimizer-Dashboard/
 │   │   │   │   ├── RegisterForm.jsx       # Registration form component
 │   │   │   │   └── ResetPasswordForm.jsx  # Reset password form
 │   │   │   ├── common/
-│   │   │   │   ├── CostsTable.jsx         # Cost breakdown table
+│   │   │   │   ├── CostsTable.jsx         # Cost breakdown table (scrollable)
 │   │   │   │   └── MetricsCard.jsx        # Reusable metric card
 │   │   │   └── dashboard/
 │   │   │       ├── charts/
 │   │   │       │   └── SpendingPieChart.jsx   # Pie chart visualization
 │   │   │       ├── tabs/
-│   │   │       │   ├── OverviewTab.jsx    # Multi-cloud overview
-│   │   │       │   └── ProviderTab.jsx    # Provider-specific view
+│   │   │       │   ├── AlertsPanel.jsx        # Cost alerts display
+│   │   │       │   ├── AnomalyDetectionPanel.jsx  # Anomaly detection display
+│   │   │       │   ├── BudgetsTab.jsx         # Budgets & Forecast tab container
+│   │   │       │   ├── BudgetTracker.jsx      # Budget tracking component
+│   │   │       │   ├── ForecastingChart.jsx   # Cost forecast chart
+│   │   │       │   ├── InsightsTab.jsx        # Insights & Alerts tab container
+│   │   │       │   ├── OverviewTab.jsx        # Multi-cloud overview
+│   │   │       │   ├── ProviderTab.jsx        # Provider-specific view
+│   │   │       │   ├── RecommendationsPanel.jsx   # Cost optimization recommendations
+│   │   │       │   └── ServicesBreakdown.jsx  # Services breakdown by category
 │   │   │       └── CloudDashboard.jsx     # Main dashboard container
 │   │   ├── hooks/
-│   │   │   └── useCloudData.js        # Custom React hooks
+│   │   │   └── useCloudData.js        # Custom React hooks (includes new feature hooks)
 │   │   ├── services/
-│   │   │   └── api.js                 # API client with auth
+│   │   │   └── api.js                 # API client with auth (includes new endpoints)
 │   │   ├── styles/
 │   │   │   ├── CloudDashboard.css     # Dashboard styles
 │   │   │   ├── global.css             # Global application styles
@@ -96,7 +112,7 @@ Cloud-Cost-Optimizer-Dashboard/
 └── README.md                          # This file
 ```
 
-**21 directories, 47 files**
+**21 directories, 56 files**
 
 ## 🛠️ Prerequisites
 
@@ -187,12 +203,26 @@ Frontend will run on `http://localhost:5173`
 6. Password is updated
 
 ### Dashboard Features
-- **Overview Tab**: Total costs across all providers
-- **Provider Tabs**: Individual AWS, Azure, GCP metrics (displayed in consistent order)
-- **Auto-refresh**: Data updates every 30 seconds
-- **Pie Chart**: Visual spending breakdown with color-coded providers
-- **Cost Tables**: Detailed service costs
-- **Provider Cards**: Individual provider costs in the Overview tab
+
+#### Overview Tab
+- Total costs across all providers
+- Provider breakdown cards (AWS → Azure → GCP)
+- Services Breakdown with expandable categories
+- Interactive pie chart for spending distribution
+
+#### Provider Tabs (AWS, Azure, GCP)
+- CPU Usage and Instances Monitored metrics
+- MTD Total Cost and Active Services count
+- Scrollable Month-to-Date Costs table by service
+
+#### Insights & Alerts Tab
+- **Alerts Panel**: Real-time cost alerts with severity filtering (Critical, High, Warning, Low)
+- **Recommendations Panel**: Cost optimization suggestions with potential savings, effort level, and impact
+- **Anomaly Detection Panel**: Unusual spending patterns with deviation percentages and recommendations
+
+#### Budgets & Forecast Tab
+- **Cost Forecast Chart**: 7-day cost predictions with confidence intervals, trend indicators (Actual vs Forecast)
+- **Budget Tracker**: Budget vs actual spending with By Provider / By Category toggle, utilization percentages, and at-risk indicators
 
 ## 🔧 Configuration
 
@@ -250,6 +280,30 @@ AZURE_CLIENT_SECRET=your-client-secret
 - `GET /api/{provider}/costs/mtd` - Month-to-date costs
 - `GET /api/{provider}/costs/daily` - Daily cost breakdown
 - `GET /api/{provider}/metrics/live` - Real-time metrics
+
+### Anomaly Detection
+- `GET /api/{provider}/anomalies` - Get anomalies for specific provider
+- `GET /api/anomalies/all` - Get anomalies from all providers
+
+### Forecasting
+- `GET /api/{provider}/forecast?days=7` - Get forecast for specific provider
+- `GET /api/forecast/all?days=7` - Get forecasts from all providers
+
+### Recommendations
+- `GET /api/{provider}/recommendations` - Get recommendations for specific provider
+- `GET /api/recommendations/all` - Get all recommendations
+
+### Alerts
+- `GET /api/{provider}/alerts` - Get alerts for specific provider
+- `GET /api/alerts/all` - Get all alerts
+
+### Budgets
+- `GET /api/{provider}/budgets` - Get budgets for specific provider
+- `GET /api/budgets/all` - Get all budgets
+
+### Services Breakdown
+- `GET /api/{provider}/services/breakdown` - Get services breakdown for specific provider
+- `GET /api/services/breakdown/all` - Get breakdown from all providers
 
 ### Health Check
 - `GET /api/health` - Service health status
@@ -366,9 +420,16 @@ npm run dev
 
 When `USE_MOCK_DATA=true` (default), the app shows:
 - 3 cloud providers (AWS, Azure, GCP)
-- Random costs between $5000-$6000 per provider
-- Sample service breakdowns
-- Simulated real-time metrics
+- **140+ cloud services** across 8 categories:
+  - AWS: 50+ services (EC2, Lambda, S3, RDS, etc.)
+  - Azure: 56+ services (VMs, Functions, Blob Storage, etc.)
+  - GCP: 53+ services (Compute Engine, Cloud Functions, etc.)
+- Categories: Compute, Storage, Database, Networking, Analytics, Machine Learning, Security, Management
+- Simulated anomalies with severity levels
+- 7-day cost forecasts with confidence intervals
+- Budget tracking with utilization metrics
+- Cost optimization recommendations with savings estimates
+- Real-time alerts with severity filtering
 - Perfect for demos and development
 
 ## 🎨 UI/UX Design
@@ -384,6 +445,16 @@ All dashboard sections display providers in consistent order:
 - Navigation tabs: AWS → AZURE → GCP
 - Pie chart legend: AWS → AZURE → GCP
 - Provider cards: AWS → AZURE → GCP
+
+### Category Color Scheme
+- **Compute**: Red (#ef4444)
+- **Storage**: Orange (#f97316)
+- **Database**: Yellow (#eab308)
+- **Networking**: Green (#22c55e)
+- **Analytics**: Teal (#14b8a6)
+- **Machine Learning**: Blue (#3b82f6)
+- **Security**: Purple (#8b5cf6)
+- **Management**: Pink (#ec4899)
 
 ## 🏗️ Component Architecture
 
@@ -408,12 +479,35 @@ src/components/auth/
 ### Dashboard Components
 ```
 src/components/dashboard/
-├── CloudDashboard.jsx     # Main dashboard with tab navigation
+├── CloudDashboard.jsx         # Main dashboard with tab navigation
 ├── charts/
 │   └── SpendingPieChart.jsx   # Pie chart for spending distribution
 └── tabs/
-    ├── OverviewTab.jsx    # Multi-cloud overview with pie chart
-    └── ProviderTab.jsx    # Individual provider details
+    ├── OverviewTab.jsx        # Multi-cloud overview with services breakdown
+    ├── ProviderTab.jsx        # Individual provider details
+    ├── InsightsTab.jsx        # Insights & Alerts tab container
+    ├── BudgetsTab.jsx         # Budgets & Forecast tab container
+    ├── AlertsPanel.jsx        # Cost alerts with severity filtering
+    ├── AnomalyDetectionPanel.jsx  # Anomaly detection display
+    ├── RecommendationsPanel.jsx   # Cost optimization recommendations
+    ├── ForecastingChart.jsx   # 7-day cost forecast with chart
+    ├── BudgetTracker.jsx      # Budget vs actual tracking
+    └── ServicesBreakdown.jsx  # Services by category breakdown
+```
+
+### Custom React Hooks
+```
+src/hooks/useCloudData.js
+├── useProviders()         # Fetch available providers
+├── useCostsSummary()      # Fetch cost summary
+├── useMTDCosts(provider)  # Fetch MTD costs
+├── useLiveMetrics(provider) # Fetch live metrics
+├── useAnomalies()         # Fetch anomaly data
+├── useForecast(days)      # Fetch forecast data
+├── useRecommendations()   # Fetch recommendations
+├── useAlerts()            # Fetch alerts
+├── useBudgets()           # Fetch budget data
+└── useServicesBreakdown() # Fetch services breakdown
 ```
 
 ## 🤝 Contributing

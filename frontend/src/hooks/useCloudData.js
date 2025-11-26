@@ -12,21 +12,18 @@ export function useProviders() {
   const abortControllerRef = useRef(null);
 
   useEffect(() => {
-    // Create abort controller for cleanup
     abortControllerRef.current = new AbortController();
-    
+
     const fetchProviders = async () => {
       try {
         setLoading(true);
         setError(null);
         const data = await api.getProviders();
-        
-        // Only update state if component is still mounted
+
         if (!abortControllerRef.current.signal.aborted) {
           setProviders(data);
         }
       } catch (err) {
-        // Only set error if component is still mounted
         if (!abortControllerRef.current.signal.aborted) {
           setError(err.message || 'Failed to fetch providers');
         }
@@ -39,7 +36,6 @@ export function useProviders() {
 
     fetchProviders();
 
-    // Cleanup function
     return () => {
       abortControllerRef.current?.abort();
     };
@@ -59,7 +55,6 @@ export function useMTDCosts(provider) {
   const mountedRef = useRef(true);
 
   useEffect(() => {
-    // Reset mounted ref
     mountedRef.current = true;
 
     if (!provider) {
@@ -72,8 +67,7 @@ export function useMTDCosts(provider) {
         setLoading(true);
         setError(null);
         const result = await api.getMTDCosts(provider);
-        
-        // Only update state if component is still mounted
+
         if (mountedRef.current) {
           setData(result);
         }
@@ -91,7 +85,6 @@ export function useMTDCosts(provider) {
 
     fetchData();
 
-    // Cleanup function
     return () => {
       mountedRef.current = false;
     };
@@ -112,7 +105,6 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    // Reset mounted ref
     mountedRef.current = true;
 
     if (!provider) {
@@ -122,14 +114,12 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
 
     const fetchData = async () => {
       try {
-        // Don't set loading on refresh to avoid UI flicker
         if (data === null) {
           setLoading(true);
         }
-        
+
         const result = await api.getLiveMetrics(provider);
-        
-        // Only update state if component is still mounted
+
         if (mountedRef.current) {
           setData(result);
           setError(null);
@@ -137,7 +127,6 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
       } catch (err) {
         if (mountedRef.current) {
           setError(err.message || 'Failed to fetch live metrics');
-          // Don't clear data on error - keep showing last successful data
         }
       } finally {
         if (mountedRef.current && data === null) {
@@ -146,15 +135,12 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
       }
     };
 
-    // Fetch immediately
     fetchData();
-    
-    // Set up interval for auto-refresh
+
     if (refreshInterval && refreshInterval > 0) {
       intervalRef.current = setInterval(fetchData, refreshInterval);
     }
 
-    // Cleanup function
     return () => {
       mountedRef.current = false;
       if (intervalRef.current) {
@@ -162,7 +148,7 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
         intervalRef.current = null;
       }
     };
-  }, [provider, refreshInterval]); // Note: including data in deps would cause infinite loop
+  }, [provider, refreshInterval]);
 
   return { data, loading, error };
 }
@@ -190,7 +176,7 @@ export function useDailyCosts(provider, days = 30) {
         setLoading(true);
         setError(null);
         const result = await api.getDailyCosts(provider, days);
-        
+
         if (mountedRef.current) {
           setData(result);
         }
@@ -239,7 +225,7 @@ export function useTimeseries(provider, type = 'cpu', minutes = 30) {
         setLoading(true);
         setError(null);
         const result = await api.getTimeseries(provider, type, minutes);
-        
+
         if (mountedRef.current) {
           setData(result);
         }
@@ -261,6 +247,268 @@ export function useTimeseries(provider, type = 'cpu', minutes = 30) {
       mountedRef.current = false;
     };
   }, [provider, type, minutes]);
+
+  return { data, loading, error };
+}
+
+/**
+ * Hook #6: Get all anomalies across providers
+ * Usage: const { data, loading, error, refetch } = useAnomalies();
+ */
+export function useAnomalies() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await api.getAllAnomalies();
+
+      if (mountedRef.current) {
+        setData(result);
+      }
+    } catch (err) {
+      if (mountedRef.current) {
+        setError(err.message || 'Failed to fetch anomalies');
+        setData([]);
+      }
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+/**
+ * Hook #7: Get forecast data for all providers
+ * Usage: const { data, loading, error } = useForecast(7);
+ */
+export function useForecast(days = 7) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await api.getAllForecasts(days);
+
+        if (mountedRef.current) {
+          setData(result);
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err.message || 'Failed to fetch forecasts');
+          setData(null);
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [days]);
+
+  return { data, loading, error };
+}
+
+/**
+ * Hook #8: Get all recommendations across providers
+ * Usage: const { data, loading, error } = useRecommendations();
+ */
+export function useRecommendations() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await api.getAllRecommendations();
+
+        if (mountedRef.current) {
+          setData(result);
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err.message || 'Failed to fetch recommendations');
+          setData(null);
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  return { data, loading, error };
+}
+
+/**
+ * Hook #9: Get all alerts across providers
+ * Usage: const { data, loading, error, refetch } = useAlerts();
+ */
+export function useAlerts() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await api.getAllAlerts();
+
+      if (mountedRef.current) {
+        setData(result);
+      }
+    } catch (err) {
+      if (mountedRef.current) {
+        setError(err.message || 'Failed to fetch alerts');
+        setData(null);
+      }
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
+/**
+ * Hook #10: Get all budgets across providers
+ * Usage: const { data, loading, error } = useBudgets();
+ */
+export function useBudgets() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await api.getAllBudgets();
+
+        if (mountedRef.current) {
+          setData(result);
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err.message || 'Failed to fetch budgets');
+          setData(null);
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  return { data, loading, error };
+}
+
+/**
+ * Hook #11: Get services breakdown for all providers
+ * Usage: const { data, loading, error } = useServicesBreakdown();
+ */
+export function useServicesBreakdown() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await api.getAllServicesBreakdown();
+
+        if (mountedRef.current) {
+          setData(result);
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err.message || 'Failed to fetch services breakdown');
+          setData(null);
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   return { data, loading, error };
 }

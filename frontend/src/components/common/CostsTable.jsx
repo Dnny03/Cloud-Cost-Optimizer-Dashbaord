@@ -67,7 +67,7 @@ export default function CostsTable({ data, loading, error }) {
   }
 
   return (
-    <div className="costs-table-wrapper">
+    <div className="costs-table-wrapper" style={{ maxHeight: '400px', overflowY: 'auto' }}>
       <table className="costs-table" role="table">
         <thead>
           <tr>

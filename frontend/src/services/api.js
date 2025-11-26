@@ -221,6 +221,78 @@ class CloudAPI {
         }
         return request(`/${provider}/metrics/timeseries?type=${type}&minutes=${minutes}`); // timeseries for charts
     }
+
+    // ---------- ANOMALY DETECTION ----------
+    getAnomalies(provider) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/anomalies`); // detected cost anomalies
+    }
+
+    getAllAnomalies() {
+        return request("/anomalies/all"); // anomalies across all providers
+    }
+
+    // ---------- FORECASTING ----------
+    getForecast(provider, days = 7) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/forecast?days=${days}`); // cost forecast
+    }
+
+    getAllForecasts(days = 7) {
+        return request(`/forecast/all?days=${days}`); // forecasts for all providers
+    }
+
+    // ---------- RECOMMENDATIONS ----------
+    getRecommendations(provider) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/recommendations`); // cost optimization recommendations
+    }
+
+    getAllRecommendations() {
+        return request("/recommendations/all"); // recommendations across all providers
+    }
+
+    // ---------- ALERTS ----------
+    getAlerts(provider) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/alerts`); // active alerts for provider
+    }
+
+    getAllAlerts() {
+        return request("/alerts/all"); // alerts across all providers
+    }
+
+    // ---------- BUDGETS ----------
+    getBudgets(provider) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/budgets`); // budget tracking for provider
+    }
+
+    getAllBudgets() {
+        return request("/budgets/all"); // budgets across all providers
+    }
+
+    // ---------- SERVICES BREAKDOWN ----------
+    getServicesBreakdown(provider) {
+        if (!provider) {
+            throw new Error('Provider is required');
+        }
+        return request(`/${provider}/services/breakdown`); // services by category
+    }
+
+    getAllServicesBreakdown() {
+        return request("/services/breakdown/all"); // breakdown for all providers
+    }
 }
 
 const api = new CloudAPI();
