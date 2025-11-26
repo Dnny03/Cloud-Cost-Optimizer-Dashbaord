@@ -12,8 +12,13 @@ export default function RecommendationsPanel() {
   const totalSavings = data?.total_potential_savings_monthly || 0;
   const yearlySavings = data?.total_potential_savings_yearly || 0;
 
-  const categories = ['all', ...new Set(recommendations.map(r => r.category))];
-  const filteredRecs = filterCategory === 'all' ? recommendations : recommendations.filter(r => r.category === filterCategory);
+  // Get unique categories from recommendations
+  const categories = ['all', ...new Set(recommendations.map(r => r.category).filter(Boolean))];
+
+  // Filter recommendations by category
+  const filteredRecs = filterCategory === 'all'
+    ? recommendations
+    : recommendations.filter(r => r.category === filterCategory);
 
   const getEffortBadge = (effort) => {
     const colors = { low: 'status-healthy', medium: 'status-warning', high: 'status-error' };
@@ -50,8 +55,12 @@ export default function RecommendationsPanel() {
 
       <div className="filter-buttons">
         {categories.map(cat => (
-          <button key={cat} className={`btn btn-secondary ${filterCategory === cat ? 'active' : ''}`} onClick={() => setFilterCategory(cat)}>
-            {cat === 'all' ? 'All' : cat}
+          <button
+            key={cat}
+            className={`btn btn-secondary ${filterCategory === cat ? 'active' : ''}`}
+            onClick={() => setFilterCategory(cat)}
+          >
+            {cat === 'all' ? `All (${recommendations.length})` : `${cat} (${recommendations.filter(r => r.category === cat).length})`}
           </button>
         ))}
       </div>
@@ -60,8 +69,8 @@ export default function RecommendationsPanel() {
         {filteredRecs.length === 0 ? (
           <div className="no-data">No recommendations in this category</div>
         ) : (
-          filteredRecs.slice(0, 6).map(rec => (
-            <div key={rec.id} className="rec-item">
+          filteredRecs.map(rec => (
+            <div key={`${rec.provider}-${rec.id}`} className="rec-item">
               <div className="rec-header">
                 <span className="rec-provider">{getProviderIcon(rec.provider)}</span>
                 <div className="rec-title-section">
@@ -92,7 +101,7 @@ export default function RecommendationsPanel() {
         .filter-buttons { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .filter-buttons .btn { padding: 6px 12px; font-size: 0.75rem; }
         .filter-buttons .btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .recommendations-list { display: flex; flex-direction: column; gap: 12px; }
+        .recommendations-list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
         .rec-item { padding: 14px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border); }
         .rec-item:hover { border-color: var(--primary); }
         .rec-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
