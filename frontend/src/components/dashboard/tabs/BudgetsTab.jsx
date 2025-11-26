@@ -8,8 +8,8 @@ export default function BudgetsTab() {
             <h2>Budgets & Forecast</h2>
 
             <div className="budgets-content">
-                <ForecastingChart/>
                 <BudgetTracker/>
+                <ForecastingChart/>
             </div>
         </div>
     );
