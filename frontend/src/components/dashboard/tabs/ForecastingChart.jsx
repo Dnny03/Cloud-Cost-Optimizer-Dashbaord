@@ -1,140 +1,126 @@
-import React, { useState } from 'react';
-import { useForecast } from '../../../hooks/useCloudData';
+import React, {useState} from 'react';
+import {useForecast} from '../../../hooks/useCloudData';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart
 } from 'recharts';
 
 export default function ForecastingChart() {
-  const [selectedProvider, setSelectedProvider] = useState('all');
-  const { data, loading, error } = useForecast(7);
+    const [selectedProvider, setSelectedProvider] = useState('all');
+    const {data, loading, error} = useForecast(7);
 
-  if (loading) return <div className="loading"><div className="loading-spinner"></div>Loading forecast...</div>;
-  if (error) return <div className="error">Failed to load forecast data</div>;
-  if (!data || !data.providers) return <div className="no-data">No forecast data available</div>;
+    if (loading) return <div className="loading">
+        <div className="loading-spinner"></div>
+        Loading forecast...</div>;
+    if (error) return <div className="error">Failed to load forecast data</div>;
+    if (!data || !data.providers) return <div className="no-data">No forecast data available</div>;
 
-  const providers = Object.keys(data.providers).filter(p => !data.providers[p].error);
+    const providers = Object.keys(data.providers).filter(p => !data.providers[p].error);
 
-  const getChartData = () => {
-    if (selectedProvider === 'all') {
-      const combinedData = {};
-      providers.forEach(provider => {
-        const forecast = data.providers[provider];
-        if (forecast?.forecast_data) {
-          forecast.forecast_data.forEach(item => {
-            if (!combinedData[item.date]) {
-              combinedData[item.date] = { date: item.date, cost: 0, cost_low: 0, cost_high: 0, type: item.type };
-            }
-            combinedData[item.date].cost += item.cost || 0;
-            combinedData[item.date].cost_low += item.cost_low || item.cost || 0;
-            combinedData[item.date].cost_high += item.cost_high || item.cost || 0;
-          });
+    const getChartData = () => {
+        if (selectedProvider === 'all') {
+            const combinedData = {};
+            providers.forEach(provider => {
+                const forecast = data.providers[provider];
+                if (forecast?.forecast_data) {
+                    forecast.forecast_data.forEach(item => {
+                        if (!combinedData[item.date]) {
+                            combinedData[item.date] = {
+                                date: item.date,
+                                cost: 0,
+                                cost_low: 0,
+                                cost_high: 0,
+                                type: item.type
+                            };
+                        }
+                        combinedData[item.date].cost += item.cost || 0;
+                        combinedData[item.date].cost_low += item.cost_low || item.cost || 0;
+                        combinedData[item.date].cost_high += item.cost_high || item.cost || 0;
+                    });
+                }
+            });
+            return Object.values(combinedData).sort((a, b) => new Date(a.date) - new Date(b.date));
         }
-      });
-      return Object.values(combinedData).sort((a, b) => new Date(a.date) - new Date(b.date));
-    }
-    return data.providers[selectedProvider]?.forecast_data || [];
-  };
+        return data.providers[selectedProvider]?.forecast_data || [];
+    };
 
-  const chartData = getChartData();
-  const currentMTD = selectedProvider === 'all' ? data.total_current_mtd : data.providers[selectedProvider]?.current_mtd || 0;
-  const projectedEOM = selectedProvider === 'all' ? data.total_projected_eom : data.providers[selectedProvider]?.projected_eom || 0;
-  const trend = selectedProvider === 'all' ? (projectedEOM > currentMTD * 1.5 ? 'increasing' : 'stable') : data.providers[selectedProvider]?.trend || 'stable';
+    const chartData = getChartData();
+    const currentMTD = selectedProvider === 'all' ? data.total_current_mtd : data.providers[selectedProvider]?.current_mtd || 0;
+    const projectedEOM = selectedProvider === 'all' ? data.total_projected_eom : data.providers[selectedProvider]?.projected_eom || 0;
+    const trend = selectedProvider === 'all' ? (projectedEOM > currentMTD * 1.5 ? 'increasing' : 'stable') : data.providers[selectedProvider]?.trend || 'stable';
 
-  const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const item = payload[0].payload;
-      return (
-        <div className="chart-tooltip">
-          <div className="tooltip-date">{formatDate(label)}</div>
-          <div className="tooltip-cost">${item.cost?.toFixed(2)}</div>
-          <div className="tooltip-type">{item.type === 'actual' ? '📊 Actual' : '🔮 Forecast'}</div>
-        </div>
-      );
-    }
-    return null;
-  };
+    const CustomTooltip = ({active, payload, label}) => {
+        if (active && payload && payload.length) {
+            const item = payload[0].payload;
+            return (
+                <div className="chart-tooltip">
+                    <div className="tooltip-date">{formatDate(label)}</div>
+                    <div className="tooltip-cost">${item.cost?.toFixed(2)}</div>
+                    <div className="tooltip-type">{item.type === 'actual' ? '📊 Actual' : '🔮 Forecast'}</div>
+                </div>
+            );
+        }
+        return null;
+    };
 
-  return (
-    <div className="card forecast-card">
-      <div className="card-header">
-        <span className="card-icon">📈</span>
-        <h4>Cost Forecast</h4>
-        <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} className="provider-select">
-          <option value="all">All Providers</option>
-          {providers.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
-        </select>
-      </div>
+    return (
+        <div className="card forecast-card">
+            <div className="card-header">
+                <span className="card-icon">📈</span>
+                <h4>Cost Forecast</h4>
+                <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)}
+                        className="provider-select">
+                    <option value="all">All Providers</option>
+                    {providers.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
+                </select>
+            </div>
 
-      <div className="forecast-stats">
-        <div className="forecast-stat">
-          <span className="stat-label">Current MTD</span>
-          <span className="stat-value">${currentMTD?.toFixed(2)}</span>
-        </div>
-        <div className="forecast-stat">
-          <span className="stat-label">Projected EOM</span>
-          <span className="stat-value projected">${projectedEOM?.toFixed(2)}</span>
-        </div>
-        <div className="forecast-stat">
-          <span className="stat-label">Trend</span>
-          <span className={`stat-value trend-${trend}`}>
+            <div className="forecast-stats">
+                <div className="forecast-stat">
+                    <span className="stat-label">Current MTD</span>
+                    <span className="stat-value">${currentMTD?.toFixed(2)}</span>
+                </div>
+                <div className="forecast-stat">
+                    <span className="stat-label">Projected EOM</span>
+                    <span className="stat-value projected">${projectedEOM?.toFixed(2)}</span>
+                </div>
+                <div className="forecast-stat">
+                    <span className="stat-label">Trend</span>
+                    <span className={`stat-value trend-${trend}`}>
             {trend === 'increasing' ? '📈' : trend === 'decreasing' ? '📉' : '➡️'} {trend}
           </span>
+                </div>
+            </div>
+
+            <div className="chart-container">
+                <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={chartData} margin={{top: 10, right: 10, left: 0, bottom: 0}}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB"/>
+                        <XAxis dataKey="date" tickFormatter={formatDate} stroke="#6B7280" fontSize={12}/>
+                        <YAxis tickFormatter={(v) => `$${v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v}`} stroke="#6B7280"
+                               fontSize={12}/>
+                        <Tooltip content={<CustomTooltip/>}/>
+                        <Area dataKey="cost_high" stroke="none" fill="#8B5CF6" fillOpacity={0.1}/>
+                        <Line
+                            type="monotone"
+                            dataKey="cost"
+                            stroke="#4F46E5"
+                            strokeWidth={2}
+                            dot={(props) => {
+                                const {cx, cy, payload} = props;
+                                const color = payload.type === 'forecast' ? '#8B5CF6' : '#4F46E5';
+                                return <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={4} fill={color} stroke={color}/>;
+                            }}
+                        />
+                    </ComposedChart>
+                </ResponsiveContainer>
+            </div>
+
+            <div className="chart-legend">
+                <span className="legend-item"><span className="legend-dot actual"></span> Actual</span>
+                <span className="legend-item"><span className="legend-dot forecast"></span> Forecast</span>
+            </div>
         </div>
-      </div>
-
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-            <XAxis dataKey="date" tickFormatter={formatDate} stroke="#6B7280" fontSize={12} />
-            <YAxis tickFormatter={(v) => `$${v >= 1000 ? (v/1000).toFixed(1) + 'k' : v}`} stroke="#6B7280" fontSize={12} />
-            <Tooltip content={<CustomTooltip />} />
-            <Area dataKey="cost_high" stroke="none" fill="#8B5CF6" fillOpacity={0.1} />
-            <Line
-              type="monotone"
-              dataKey="cost"
-              stroke="#4F46E5"
-              strokeWidth={2}
-              dot={(props) => {
-                const { cx, cy, payload } = props;
-                const color = payload.type === 'forecast' ? '#8B5CF6' : '#4F46E5';
-                return <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={4} fill={color} stroke={color} />;
-              }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="chart-legend">
-        <span className="legend-item"><span className="legend-dot actual"></span> Actual</span>
-        <span className="legend-item"><span className="legend-dot forecast"></span> Forecast</span>
-      </div>
-
-      <style>{`
-        .forecast-card .card-header { display: flex; align-items: center; gap: 12px; }
-        .forecast-card .card-header h4 { flex: 1; margin: 0; }
-        .provider-select { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: white; }
-        .forecast-stats { display: flex; gap: 32px; padding: 16px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 20px; }
-        .forecast-stat { display: flex; flex-direction: column; }
-        .forecast-stat .stat-label { font-size: 0.75rem; color: var(--text-muted); }
-        .forecast-stat .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); }
-        .forecast-stat .stat-value.projected { color: #8B5CF6; }
-        .forecast-stat .stat-value.trend-increasing { color: var(--warning); }
-        .forecast-stat .stat-value.trend-decreasing { color: var(--success); }
-        .forecast-stat .stat-value.trend-stable { color: var(--primary); }
-        .chart-container { margin-bottom: 12px; }
-        .chart-tooltip { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; box-shadow: var(--shadow); }
-        .tooltip-date { font-size: 0.8rem; color: var(--text-muted); }
-        .tooltip-cost { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        .tooltip-type { font-size: 0.75rem; color: var(--text-secondary); }
-        .chart-legend { display: flex; justify-content: center; gap: 24px; }
-        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary); }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .legend-dot.actual { background: #4F46E5; }
-        .legend-dot.forecast { background: #8B5CF6; }
-      `}</style>
-    </div>
-  );
+    );
 }

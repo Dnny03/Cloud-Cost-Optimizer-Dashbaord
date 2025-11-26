@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import api from "../../services/api.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import "../../styles/login.css";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
@@ -193,7 +193,7 @@ export default function Login() {
 
         setLoading(true);
         try {
-            const r = await api.forgotPassword({ username, email });
+            const r = await api.forgotPassword({username, email});
             // In dev, backend returns the token; in prod this would be emailed
             if (r?.reset_token) {
                 // Don't show the token to user anymore - just set it silently
@@ -255,7 +255,7 @@ export default function Login() {
     // Static header section
     const Header = (
         <div className="auth-header">
-            <div className="logo-dot" role="img" aria-label="Cloud Cost Optimizer Logo" />
+            <div className="logo-dot" role="img" aria-label="Cloud Cost Optimizer Logo"/>
             <h1>Cloud Cost Optimizer</h1>
         </div>
     );

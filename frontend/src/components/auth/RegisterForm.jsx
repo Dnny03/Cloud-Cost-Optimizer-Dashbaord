@@ -1,21 +1,21 @@
 import React from "react";
 
 export default function RegisterForm({
-    username,
-    setUsername,
-    email,
-    setEmail,
-    role,
-    setRole,
-    password,
-    setPassword,
-    showRegPw,
-    setShowRegPw,
-    loading,
-    validateEmail,
-    onSubmit,
-    onSwitchToLogin
-}) {
+                                         username,
+                                         setUsername,
+                                         email,
+                                         setEmail,
+                                         role,
+                                         setRole,
+                                         password,
+                                         setPassword,
+                                         showRegPw,
+                                         setShowRegPw,
+                                         loading,
+                                         validateEmail,
+                                         onSubmit,
+                                         onSwitchToLogin
+                                     }) {
     return (
         <form onSubmit={onSubmit} className="auth-form" noValidate>
             <label className="auth-label">

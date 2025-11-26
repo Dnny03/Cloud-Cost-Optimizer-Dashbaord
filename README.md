@@ -1,10 +1,12 @@
 # Cloud Cost Optimizer Dashboard
 
-A full-stack multi-cloud cost monitoring dashboard that provides real-time insights into AWS, GCP, and Azure spending with authentication, role-based access control, anomaly detection, cost forecasting, and optimization recommendations.
+A full-stack multi-cloud cost monitoring dashboard that provides real-time insights into AWS, GCP, and Azure spending
+with authentication, role-based access control, anomaly detection, cost forecasting, and optimization recommendations.
 
 ## 🚀 Features
 
 ### Authentication & Security
+
 - **JWT-based authentication** with secure token storage
 - **Role-based access control** (Admin/Viewer roles)
 - **Password reset functionality** with token-based recovery
@@ -13,6 +15,7 @@ A full-stack multi-cloud cost monitoring dashboard that provides real-time insig
 - **Modular auth components** for better maintainability
 
 ### Dashboard Capabilities
+
 - **Multi-cloud support** for AWS, GCP, and Azure
 - **Real-time metrics monitoring** with auto-refresh (30-second intervals)
 - **Month-to-date cost tracking** by service and project
@@ -22,6 +25,7 @@ A full-stack multi-cloud cost monitoring dashboard that provides real-time insig
 - **Color-coded pie chart** matching provider icons
 
 ### Cost Intelligence Features
+
 - **Anomaly Detection** - Identifies unusual spending patterns with severity levels and recommendations
 - **Cost Forecasting** - 7-day cost predictions with confidence intervals and trend analysis
 - **Optimization Recommendations** - Actionable suggestions with potential savings estimates
@@ -117,6 +121,7 @@ Cloud-Cost-Optimizer-Dashboard/
 ## 🛠️ Prerequisites
 
 ### System Requirements
+
 - **Python** 3.8 or higher
 - **Node.js** 16.x or higher
 - **npm** 8.x or higher
@@ -125,6 +130,7 @@ Cloud-Cost-Optimizer-Dashboard/
 ## 📦 Quick Start
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd Cloud-Cost-Optimizer-Dashboard
@@ -144,6 +150,7 @@ python app.py
 ```
 
 The backend will automatically:
+
 - Create the SQLite database on first run
 - Initialize all required tables
 - Use mock data (configured in .env file)
@@ -169,10 +176,10 @@ Frontend will run on `http://localhost:5173`
 1. Open browser to `http://localhost:5173`
 2. Click **"Create account"** on the login page
 3. Fill in:
-   - Username (required)
-   - Password (required)
-   - Email (optional - for password recovery)
-   - Role (select Admin for full access)
+    - Username (required)
+    - Password (required)
+    - Email (optional - for password recovery)
+    - Role (select Admin for full access)
 4. Click **"Create Account"**
 5. Sign in with your new credentials
 
@@ -181,6 +188,7 @@ Frontend will run on `http://localhost:5173`
 ## 🎯 Usage
 
 ### User Registration
+
 1. Navigate to login page
 2. Click "Create account"
 3. Enter username and password
@@ -189,12 +197,14 @@ Frontend will run on `http://localhost:5173`
 6. Account is created instantly
 
 ### Login Process
+
 1. Enter username and password
 2. Click "Sign In"
 3. JWT token is stored in browser
 4. Redirected to dashboard
 
 ### Password Reset
+
 1. Click "Forgot password?" on login
 2. Enter username or email
 3. Receive reset token (displayed in dev mode)
@@ -205,30 +215,36 @@ Frontend will run on `http://localhost:5173`
 ### Dashboard Features
 
 #### Overview Tab
+
 - Total costs across all providers
 - Provider breakdown cards (AWS → Azure → GCP)
 - Services Breakdown with expandable categories
 - Interactive pie chart for spending distribution
 
 #### Provider Tabs (AWS, Azure, GCP)
+
 - CPU Usage and Instances Monitored metrics
 - MTD Total Cost and Active Services count
 - Scrollable Month-to-Date Costs table by service
 
 #### Insights & Alerts Tab
+
 - **Alerts Panel**: Real-time cost alerts with severity filtering (Critical, High, Warning, Low)
 - **Recommendations Panel**: Cost optimization suggestions with potential savings, effort level, and impact
 - **Anomaly Detection Panel**: Unusual spending patterns with deviation percentages and recommendations
 
 #### Budgets & Forecast Tab
+
 - **Cost Forecast Chart**: 7-day cost predictions with confidence intervals, trend indicators (Actual vs Forecast)
-- **Budget Tracker**: Budget vs actual spending with By Provider / By Category toggle, utilization percentages, and at-risk indicators
+- **Budget Tracker**: Budget vs actual spending with By Provider / By Category toggle, utilization percentages, and
+  at-risk indicators
 
 ## 🔧 Configuration
 
 ### Mock Data vs Real Data
 
 The application includes a `.env` file in the backend directory with:
+
 ```
 USE_MOCK_DATA=true
 ```
@@ -268,6 +284,7 @@ AZURE_CLIENT_SECRET=your-client-secret
 ## 📌 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Create new account
 - `POST /api/auth/login` - Login and receive JWT
 - `GET /api/auth/me` - Get current user info
@@ -275,6 +292,7 @@ AZURE_CLIENT_SECRET=your-client-secret
 - `POST /api/auth/reset` - Reset password with token
 
 ### Provider Data
+
 - `GET /api/providers` - List configured providers
 - `GET /api/costs/summary` - Multi-cloud cost summary
 - `GET /api/{provider}/costs/mtd` - Month-to-date costs
@@ -282,35 +300,43 @@ AZURE_CLIENT_SECRET=your-client-secret
 - `GET /api/{provider}/metrics/live` - Real-time metrics
 
 ### Anomaly Detection
+
 - `GET /api/{provider}/anomalies` - Get anomalies for specific provider
 - `GET /api/anomalies/all` - Get anomalies from all providers
 
 ### Forecasting
+
 - `GET /api/{provider}/forecast?days=7` - Get forecast for specific provider
 - `GET /api/forecast/all?days=7` - Get forecasts from all providers
 
 ### Recommendations
+
 - `GET /api/{provider}/recommendations` - Get recommendations for specific provider
 - `GET /api/recommendations/all` - Get all recommendations
 
 ### Alerts
+
 - `GET /api/{provider}/alerts` - Get alerts for specific provider
 - `GET /api/alerts/all` - Get all alerts
 
 ### Budgets
+
 - `GET /api/{provider}/budgets` - Get budgets for specific provider
 - `GET /api/budgets/all` - Get all budgets
 
 ### Services Breakdown
+
 - `GET /api/{provider}/services/breakdown` - Get services breakdown for specific provider
 - `GET /api/services/breakdown/all` - Get breakdown from all providers
 
 ### Health Check
+
 - `GET /api/health` - Service health status
 
 ## 🚦 Development Scripts
 
 ### Backend
+
 ```bash
 # Run Flask server (default)
 python app.py
@@ -323,6 +349,7 @@ python app.py --port 5001
 ```
 
 ### Frontend
+
 ```bash
 # Development server with hot reload
 npm run dev
@@ -340,6 +367,7 @@ npm run lint
 ## 📊 Technology Stack
 
 ### Backend
+
 - **Flask** - Python web framework
 - **SQLAlchemy** - Database ORM
 - **SQLite** - Embedded database
@@ -348,6 +376,7 @@ npm run lint
 - **python-dotenv** - Environment variables
 
 ### Frontend
+
 - **React 18** - UI framework
 - **Vite** - Build tool and dev server
 - **React Router v6** - Client-side routing
@@ -368,6 +397,7 @@ npm run lint
 ### Backend Issues
 
 **Port 5000 already in use:**
+
 ```bash
 # Find process using port 5000
 lsof -i :5000  # Mac/Linux
@@ -378,6 +408,7 @@ python app.py --port 5001
 ```
 
 **Database errors:**
+
 ```bash
 # Delete database and let it recreate
 rm instance/app.db  # Mac/Linux
@@ -386,17 +417,20 @@ python app.py
 ```
 
 **No cloud data showing:**
+
 - Check if `USE_MOCK_DATA=true` in `.env` (uses simulated data)
 - If set to `false`, verify cloud credentials in `.env`
 
 ### Frontend Issues
 
 **Cannot connect to backend:**
+
 - Verify backend is running on port 5000
 - Check browser console for errors
 - Ensure both servers are running
 
 **Login not working:**
+
 - Clear browser localStorage
 - Check network tab for API errors
 - Verify backend is responding
@@ -404,6 +438,7 @@ python app.py
 ### Quick Reset
 
 **Reset everything:**
+
 ```bash
 # Backend
 cd backend
@@ -419,11 +454,12 @@ npm run dev
 ## 📈 Mock Data Details
 
 When `USE_MOCK_DATA=true` (default), the app shows:
+
 - 3 cloud providers (AWS, Azure, GCP)
 - **140+ cloud services** across 8 categories:
-  - AWS: 50+ services (EC2, Lambda, S3, RDS, etc.)
-  - Azure: 56+ services (VMs, Functions, Blob Storage, etc.)
-  - GCP: 53+ services (Compute Engine, Cloud Functions, etc.)
+    - AWS: 50+ services (EC2, Lambda, S3, RDS, etc.)
+    - Azure: 56+ services (VMs, Functions, Blob Storage, etc.)
+    - GCP: 53+ services (Compute Engine, Cloud Functions, etc.)
 - Categories: Compute, Storage, Database, Networking, Analytics, Machine Learning, Security, Management
 - Simulated anomalies with severity levels
 - 7-day cost forecasts with confidence intervals
@@ -435,18 +471,23 @@ When `USE_MOCK_DATA=true` (default), the app shows:
 ## 🎨 UI/UX Design
 
 ### Provider Color Scheme
+
 Consistent colors are used throughout the dashboard:
+
 - **AWS**: Orange (#f59e0b) with 🟠 icon
 - **Azure**: Blue (#3b82f6) with 🔷 icon
 - **GCP**: Gray (#94a3b8) with ☁️ icon
 
 ### Provider Ordering
+
 All dashboard sections display providers in consistent order:
+
 - Navigation tabs: AWS → AZURE → GCP
 - Pie chart legend: AWS → AZURE → GCP
 - Provider cards: AWS → AZURE → GCP
 
 ### Category Color Scheme
+
 - **Compute**: Red (#ef4444)
 - **Storage**: Orange (#f97316)
 - **Database**: Yellow (#eab308)
@@ -459,6 +500,7 @@ All dashboard sections display providers in consistent order:
 ## 🏗️ Component Architecture
 
 ### Authentication Components
+
 The authentication system uses a modular component architecture:
 
 ```
@@ -471,12 +513,14 @@ src/components/auth/
 ```
 
 **Benefits:**
+
 - Better code organization and separation of concerns
 - Easier to maintain and debug individual forms
 - Enables independent testing of each form
 - Facilitates parallel development
 
 ### Dashboard Components
+
 ```
 src/components/dashboard/
 ├── CloudDashboard.jsx         # Main dashboard with tab navigation
@@ -496,6 +540,7 @@ src/components/dashboard/
 ```
 
 ### Custom React Hooks
+
 ```
 src/hooks/useCloudData.js
 ├── useProviders()         # Fetch available providers
@@ -519,6 +564,7 @@ src/hooks/useCloudData.js
 5. Open Pull Request
 
 ### Development Best Practices
+
 - Keep mock data mode enabled for development
 - Test with real credentials only in secure environment
 - Follow existing code structure
@@ -529,6 +575,7 @@ src/hooks/useCloudData.js
 ## 📝 Dependencies
 
 ### Python (requirements.txt)
+
 ```
 Flask==2.3.0
 Flask-SQLAlchemy==3.0.0
@@ -542,6 +589,7 @@ azure-mgmt-costmanagement==3.0.0  # Azure SDK (optional)
 ```
 
 ### Node.js (key dependencies)
+
 ```json
 {
   "react": "^18.2.0",
@@ -561,6 +609,7 @@ This project is licensed under the MIT License.
 Created by **Team Cloud** for CIS4951 - Capstone II course at Florida International University.
 
 ### Contributors
+
 - Daniel Gonzalez - Project Leader / Full Stack Developer
 - Sandy Aguilar - Full Stack Developer
 - Isabel Ruiz - Full Stack Developer
@@ -584,10 +633,12 @@ Created by **Team Cloud** for CIS4951 - Capstone II course at Florida Internatio
 ---
 
 **Quick Start Summary:**
+
 1. Clone repo
 2. Backend: `cd backend && pip install -r requirements.txt && python app.py`
 3. Frontend: `cd frontend && npm install && npm run dev`
 4. Open `http://localhost:5173` and create account
 5. Dashboard shows mock data by default (perfect for demos!)
 
-To use real cloud data: Edit `backend/.env` file and change `USE_MOCK_DATA=false`, then add your cloud credentials to the same file.
+To use real cloud data: Edit `backend/.env` file and change `USE_MOCK_DATA=false`, then add your cloud credentials to
+the same file.

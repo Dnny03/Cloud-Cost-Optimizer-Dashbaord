@@ -1,18 +1,18 @@
 import React from "react";
 
 export default function LoginForm({
-    username,
-    setUsername,
-    password,
-    setPassword,
-    showPw,
-    setShowPw,
-    loading,
-    error,
-    onSubmit,
-    onSwitchToRegister,
-    onSwitchToForgot
-}) {
+                                      username,
+                                      setUsername,
+                                      password,
+                                      setPassword,
+                                      showPw,
+                                      setShowPw,
+                                      loading,
+                                      error,
+                                      onSubmit,
+                                      onSwitchToRegister,
+                                      onSwitchToForgot
+                                  }) {
     return (
         <form onSubmit={onSubmit} className="auth-form" noValidate>
             <label className="auth-label">

@@ -14,7 +14,7 @@ const storage = {
             return null;
         }
     },
-    
+
     setItem(key, value) {
         try {
             localStorage.setItem(key, value);
@@ -24,7 +24,7 @@ const storage = {
             return false;
         }
     },
-    
+
     removeItem(key) {
         try {
             localStorage.removeItem(key);
@@ -119,21 +119,21 @@ class CloudAPI {
         if (!username || !password) {
             throw new Error('Username and password are required');
         }
-        
+
         // allow401 so the login form can show server-provided error text without redirect
         const data = await request("/auth/login", {
             method: "POST",
             body: JSON.stringify({username, password}),
             allow401: true,
         });
-        
+
         if (data?.token) {
             storage.setItem("token", data.token);   // persist JWT
         }
         if (data?.user) {
             storage.setItem("user", JSON.stringify(data.user)); // persist user info
         }
-        
+
         return data;
     }
 
@@ -141,7 +141,7 @@ class CloudAPI {
         if (!username || !password) {
             throw new Error('Username and password are required');
         }
-        
+
         return request("/auth/register", {
             method: "POST",
             body: JSON.stringify({username, password, email, role}),
@@ -153,7 +153,7 @@ class CloudAPI {
         if (!username && !email) {
             throw new Error('Username or email is required');
         }
-        
+
         return request("/auth/forgot", {
             method: "POST",
             body: JSON.stringify({username, email}),
@@ -165,7 +165,7 @@ class CloudAPI {
         if (!token || !new_password) {
             throw new Error('Token and new password are required');
         }
-        
+
         return request("/auth/reset", {
             method: "POST",
             body: JSON.stringify({token, new_password}),

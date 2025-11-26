@@ -1,19 +1,19 @@
 import React from "react";
 
 export default function ResetPasswordForm({
-    resetToken,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    showNewPw,
-    setShowNewPw,
-    showConfirmPw,
-    setShowConfirmPw,
-    loading,
-    onSubmit,
-    onSwitchToLogin
-}) {
+                                              resetToken,
+                                              newPassword,
+                                              setNewPassword,
+                                              confirmPassword,
+                                              setConfirmPassword,
+                                              showNewPw,
+                                              setShowNewPw,
+                                              showConfirmPw,
+                                              setShowConfirmPw,
+                                              loading,
+                                              onSubmit,
+                                              onSwitchToLogin
+                                          }) {
     return (
         <form onSubmit={onSubmit} className="auth-form" noValidate>
             {/* Hidden token field - not shown to user */}
@@ -78,7 +78,7 @@ export default function ResetPasswordForm({
 
             {/* Real-time password match feedback */}
             {confirmPassword && newPassword !== confirmPassword && (
-                <div style={{ color: '#ff6b6b', fontSize: '0.875rem', marginTop: '-0.5rem' }}>
+                <div style={{color: '#ff6b6b', fontSize: '0.875rem', marginTop: '-0.5rem'}}>
                     Passwords do not match
                 </div>
             )}

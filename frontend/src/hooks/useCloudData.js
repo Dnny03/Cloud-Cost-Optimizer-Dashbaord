@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import {useState, useEffect, useRef} from 'react';
 import api from '../services/api';
 
 /**
@@ -6,42 +6,42 @@ import api from '../services/api';
  * Usage: const { providers, loading, error } = useProviders();
  */
 export function useProviders() {
-  const [providers, setProviders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const abortControllerRef = useRef(null);
+    const [providers, setProviders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const abortControllerRef = useRef(null);
 
-  useEffect(() => {
-    abortControllerRef.current = new AbortController();
+    useEffect(() => {
+        abortControllerRef.current = new AbortController();
 
-    const fetchProviders = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await api.getProviders();
+        const fetchProviders = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await api.getProviders();
 
-        if (!abortControllerRef.current.signal.aborted) {
-          setProviders(data);
-        }
-      } catch (err) {
-        if (!abortControllerRef.current.signal.aborted) {
-          setError(err.message || 'Failed to fetch providers');
-        }
-      } finally {
-        if (!abortControllerRef.current.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
+                if (!abortControllerRef.current.signal.aborted) {
+                    setProviders(data);
+                }
+            } catch (err) {
+                if (!abortControllerRef.current.signal.aborted) {
+                    setError(err.message || 'Failed to fetch providers');
+                }
+            } finally {
+                if (!abortControllerRef.current.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    fetchProviders();
+        fetchProviders();
 
-    return () => {
-      abortControllerRef.current?.abort();
-    };
-  }, []);
+        return () => {
+            abortControllerRef.current?.abort();
+        };
+    }, []);
 
-  return { providers, loading, error };
+    return {providers, loading, error};
 }
 
 /**
@@ -49,48 +49,48 @@ export function useProviders() {
  * Usage: const { data, loading, error } = useMTDCosts('gcp');
  */
 export function useMTDCosts(provider) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    if (!provider) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getMTDCosts(provider);
-
-        if (mountedRef.current) {
-          setData(result);
+        if (!provider) {
+            setLoading(false);
+            return;
         }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch MTD costs');
-          setData([]);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchData();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getMTDCosts(provider);
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [provider]);
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch MTD costs');
+                    setData([]);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-  return { data, loading, error };
+        fetchData();
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, [provider]);
+
+    return {data, loading, error};
 }
 
 /**
@@ -98,59 +98,59 @@ export function useMTDCosts(provider) {
  * Usage: const { data, loading, error } = useLiveMetrics('gcp', 30000);
  */
 export function useLiveMetrics(provider, refreshInterval = 30000) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
-  const intervalRef = useRef(null);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
+    const intervalRef = useRef(null);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    if (!provider) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        if (data === null) {
-          setLoading(true);
+        if (!provider) {
+            setLoading(false);
+            return;
         }
 
-        const result = await api.getLiveMetrics(provider);
+        const fetchData = async () => {
+            try {
+                if (data === null) {
+                    setLoading(true);
+                }
 
-        if (mountedRef.current) {
-          setData(result);
-          setError(null);
+                const result = await api.getLiveMetrics(provider);
+
+                if (mountedRef.current) {
+                    setData(result);
+                    setError(null);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch live metrics');
+                }
+            } finally {
+                if (mountedRef.current && data === null) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+
+        if (refreshInterval && refreshInterval > 0) {
+            intervalRef.current = setInterval(fetchData, refreshInterval);
         }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch live metrics');
-        }
-      } finally {
-        if (mountedRef.current && data === null) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchData();
+        return () => {
+            mountedRef.current = false;
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, [provider, refreshInterval]);
 
-    if (refreshInterval && refreshInterval > 0) {
-      intervalRef.current = setInterval(fetchData, refreshInterval);
-    }
-
-    return () => {
-      mountedRef.current = false;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [provider, refreshInterval]);
-
-  return { data, loading, error };
+    return {data, loading, error};
 }
 
 /**
@@ -158,48 +158,48 @@ export function useLiveMetrics(provider, refreshInterval = 30000) {
  * Usage: const { data, loading, error } = useDailyCosts('aws', 30);
  */
 export function useDailyCosts(provider, days = 30) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    if (!provider) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getDailyCosts(provider, days);
-
-        if (mountedRef.current) {
-          setData(result);
+        if (!provider) {
+            setLoading(false);
+            return;
         }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch daily costs');
-          setData([]);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchData();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getDailyCosts(provider, days);
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [provider, days]);
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch daily costs');
+                    setData([]);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-  return { data, loading, error };
+        fetchData();
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, [provider, days]);
+
+    return {data, loading, error};
 }
 
 /**
@@ -207,48 +207,48 @@ export function useDailyCosts(provider, days = 30) {
  * Usage: const { data, loading, error } = useTimeseries('gcp', 'cpu', 30);
  */
 export function useTimeseries(provider, type = 'cpu', minutes = 30) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    if (!provider) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getTimeseries(provider, type, minutes);
-
-        if (mountedRef.current) {
-          setData(result);
+        if (!provider) {
+            setLoading(false);
+            return;
         }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch timeseries data');
-          setData([]);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchData();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getTimeseries(provider, type, minutes);
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [provider, type, minutes]);
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch timeseries data');
+                    setData([]);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-  return { data, loading, error };
+        fetchData();
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, [provider, type, minutes]);
+
+    return {data, loading, error};
 }
 
 /**
@@ -256,42 +256,42 @@ export function useTimeseries(provider, type = 'cpu', minutes = 30) {
  * Usage: const { data, loading, error, refetch } = useAnomalies();
  */
 export function useAnomalies() {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await api.getAllAnomalies();
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await api.getAllAnomalies();
 
-      if (mountedRef.current) {
-        setData(result);
-      }
-    } catch (err) {
-      if (mountedRef.current) {
-        setError(err.message || 'Failed to fetch anomalies');
-        setData([]);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    mountedRef.current = true;
-    fetchData();
-
-    return () => {
-      mountedRef.current = false;
+            if (mountedRef.current) {
+                setData(result);
+            }
+        } catch (err) {
+            if (mountedRef.current) {
+                setError(err.message || 'Failed to fetch anomalies');
+                setData([]);
+            }
+        } finally {
+            if (mountedRef.current) {
+                setLoading(false);
+            }
+        }
     };
-  }, []);
 
-  return { data, loading, error, refetch: fetchData };
+    useEffect(() => {
+        mountedRef.current = true;
+        fetchData();
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
+
+    return {data, loading, error, refetch: fetchData};
 }
 
 /**
@@ -299,43 +299,43 @@ export function useAnomalies() {
  * Usage: const { data, loading, error } = useForecast(7);
  */
 export function useForecast(days = 7) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getAllForecasts(days);
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getAllForecasts(days);
 
-        if (mountedRef.current) {
-          setData(result);
-        }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch forecasts');
-          setData(null);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch forecasts');
+                    setData(null);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    fetchData();
+        fetchData();
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [days]);
+        return () => {
+            mountedRef.current = false;
+        };
+    }, [days]);
 
-  return { data, loading, error };
+    return {data, loading, error};
 }
 
 /**
@@ -343,43 +343,43 @@ export function useForecast(days = 7) {
  * Usage: const { data, loading, error } = useRecommendations();
  */
 export function useRecommendations() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getAllRecommendations();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getAllRecommendations();
 
-        if (mountedRef.current) {
-          setData(result);
-        }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch recommendations');
-          setData(null);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch recommendations');
+                    setData(null);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    fetchData();
+        fetchData();
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
 
-  return { data, loading, error };
+    return {data, loading, error};
 }
 
 /**
@@ -387,42 +387,42 @@ export function useRecommendations() {
  * Usage: const { data, loading, error, refetch } = useAlerts();
  */
 export function useAlerts() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await api.getAllAlerts();
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await api.getAllAlerts();
 
-      if (mountedRef.current) {
-        setData(result);
-      }
-    } catch (err) {
-      if (mountedRef.current) {
-        setError(err.message || 'Failed to fetch alerts');
-        setData(null);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    mountedRef.current = true;
-    fetchData();
-
-    return () => {
-      mountedRef.current = false;
+            if (mountedRef.current) {
+                setData(result);
+            }
+        } catch (err) {
+            if (mountedRef.current) {
+                setError(err.message || 'Failed to fetch alerts');
+                setData(null);
+            }
+        } finally {
+            if (mountedRef.current) {
+                setLoading(false);
+            }
+        }
     };
-  }, []);
 
-  return { data, loading, error, refetch: fetchData };
+    useEffect(() => {
+        mountedRef.current = true;
+        fetchData();
+
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
+
+    return {data, loading, error, refetch: fetchData};
 }
 
 /**
@@ -430,43 +430,43 @@ export function useAlerts() {
  * Usage: const { data, loading, error } = useBudgets();
  */
 export function useBudgets() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getAllBudgets();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getAllBudgets();
 
-        if (mountedRef.current) {
-          setData(result);
-        }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch budgets');
-          setData(null);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch budgets');
+                    setData(null);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    fetchData();
+        fetchData();
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
 
-  return { data, loading, error };
+    return {data, loading, error};
 }
 
 /**
@@ -474,41 +474,41 @@ export function useBudgets() {
  * Usage: const { data, loading, error } = useServicesBreakdown();
  */
 export function useServicesBreakdown() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const mountedRef = useRef(true);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
+    useEffect(() => {
+        mountedRef.current = true;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await api.getAllServicesBreakdown();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await api.getAllServicesBreakdown();
 
-        if (mountedRef.current) {
-          setData(result);
-        }
-      } catch (err) {
-        if (mountedRef.current) {
-          setError(err.message || 'Failed to fetch services breakdown');
-          setData(null);
-        }
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
+                if (mountedRef.current) {
+                    setData(result);
+                }
+            } catch (err) {
+                if (mountedRef.current) {
+                    setError(err.message || 'Failed to fetch services breakdown');
+                    setData(null);
+                }
+            } finally {
+                if (mountedRef.current) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    fetchData();
+        fetchData();
 
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
 
-  return { data, loading, error };
+    return {data, loading, error};
 }

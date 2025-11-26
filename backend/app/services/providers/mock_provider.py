@@ -554,7 +554,7 @@ class MockProvider(BaseCloudProvider):
         for i, rec in enumerate(selected):
             savings = random.randint(rec['potential_savings'][0], rec['potential_savings'][1])
             recommendations.append({
-                'id': f"rec-{i+1:03d}",
+                'id': f"rec-{i + 1:03d}",
                 'type': rec['type'],
                 'title': rec['title'],
                 'description': rec['description'],

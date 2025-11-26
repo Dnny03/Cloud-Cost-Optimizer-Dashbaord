@@ -1,16 +1,16 @@
 import React from "react";
 
 export default function ForgotPasswordForm({
-    username,
-    setUsername,
-    email,
-    setEmail,
-    loading,
-    onSubmit,
-    setResetToken,
-    setMode,
-    onSwitchToLogin
-}) {
+                                               username,
+                                               setUsername,
+                                               email,
+                                               setEmail,
+                                               loading,
+                                               onSubmit,
+                                               setResetToken,
+                                               setMode,
+                                               onSwitchToLogin
+                                           }) {
     return (
         <form onSubmit={onSubmit} className="auth-form" noValidate>
             <p>Enter your username or email to receive reset instructions.</p>
