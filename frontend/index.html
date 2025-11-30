@@ -1,38 +1,150 @@
+<!--
+  frontend/index.html
+
+  Application HTML Template
+
+  This is the main HTML template for the Cloud Cost Optimizer application.
+  It serves as the entry point that Vite uses to build and serve the app.
+
+  Responsibilities:
+  - Define the HTML document structure
+  - Load external fonts (Inter from Google Fonts)
+  - Set up CSS custom properties (design tokens)
+  - Apply base styles and background gradient
+  - Provide the #root mount point for React
+  - Load the main JavaScript entry point
+
+  The visual design uses a dark theme with purple and cyan accent colors,
+  creating a modern "dashboard" aesthetic suitable for data visualization.
+-->
 <!doctype html>
 <html lang="en">
 <head>
+    <!-- Character encoding - UTF-8 supports international characters -->
     <meta charset="UTF-8"/>
+
+    <!-- Viewport meta tag for responsive design -->
+    <!-- width=device-width: Match screen width -->
+    <!-- initial-scale=1.0: No zoom on load -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- Default page title - Updated dynamically by React (TitleUpdater component) -->
     <title>frontend</title>
-    <!-- Modern, legible UI font -->
+
+    <!--
+      Google Fonts: Inter
+
+      Inter is a modern, highly legible sans-serif font designed for screens.
+      Features excellent readability at small sizes and clean aesthetics.
+
+      Weights loaded:
+      - 400: Regular (body text)
+      - 500: Medium (subtle emphasis)
+      - 600: Semi-bold (headings, labels)
+      - 700: Bold (strong emphasis)
+      - 800: Extra-bold (hero text)
+
+      preconnect hints tell the browser to establish early connections
+      to the font servers, reducing load time.
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
+        /*
+         * CSS Custom Properties (Design Tokens)
+         *
+         * These variables define the application's color palette and styling constants.
+         * Using CSS variables allows for:
+         * - Consistent theming across components
+         * - Easy theme modifications
+         * - Potential dark/light mode switching
+         *
+         * Color Palette:
+         * - Backgrounds: Deep navy/slate tones (#0f1729, #111827)
+         * - Text: Light gray (#e5e7eb) for readability on dark backgrounds
+         * - Muted: Slate gray (#94a3b8) for secondary text
+         * - Accents: Purple (#7c3aed) and Cyan (#22d3ee) for highlights
+         * - Semantic: Green (#22c55e) for success, Red (#ef4444) for danger
+         */
         :root {
-            --bg: #0f1729;
-            --panel: #111827;
-            --panel-2: #0b1220;
-            --muted: #94a3b8;
-            --text: #e5e7eb;
-            --accent: #7c3aed; /* purple */
-            --accent-2: #22d3ee; /* cyan */
-            --success: #22c55e;
-            --danger: #ef4444;
-            --card: #0e1627;
-            --card-border: #1f2937;
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-            --radius: 14px;
+            /* Background colors - layered from darkest to lighter */
+            --bg: #0f1729;           /* Main page background */
+            --panel: #111827;        /* Primary panel/card background */
+            --panel-2: #0b1220;      /* Secondary/nested panel background */
+
+            /* Text colors */
+            --muted: #94a3b8;        /* Secondary/helper text (slate-400) */
+            --text: #e5e7eb;         /* Primary text color (gray-200) */
+
+            /* Accent colors for interactive elements and highlights */
+            --accent: #7c3aed;       /* Primary accent - purple (violet-600) */
+            --accent-2: #22d3ee;     /* Secondary accent - cyan (cyan-400) */
+
+            /* Semantic colors for status indicators */
+            --success: #22c55e;      /* Success/healthy state (green-500) */
+            --danger: #ef4444;       /* Error/danger state (red-500) */
+
+            /* Card styling */
+            --card: #0e1627;         /* Card background color */
+            --card-border: #1f2937;  /* Card border color (gray-800) */
+
+            /* Effects */
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);  /* Elevated shadow effect */
+            --radius: 14px;          /* Border radius for cards and buttons */
         }
 
+        /*
+         * Full-Height Layout
+         *
+         * Ensures the React app can fill the entire viewport height.
+         * Without this, centering content vertically becomes difficult.
+         */
         html, body, #root {
             height: 100%;
         }
 
+        /*
+         * Body Styles
+         *
+         * Base styles applied to the entire application:
+         * - Reset default margin
+         * - Set font stack with Inter as primary
+         * - Apply text color from design tokens
+         * - Create gradient background effect
+         *
+         * Background Gradient:
+         * Creates a subtle, layered gradient effect with two radial gradients
+         * (purple top-left, cyan top-right) over a linear gradient base.
+         * This gives the dashboard a modern, atmospheric appearance.
+         */
         body {
-            margin: 0;
+            margin: 0;  /* Remove default browser margin */
+
+            /* Font stack: Inter preferred, then system fonts as fallbacks */
             font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+            /* Default text color */
             color: var(--text);
+
+            /*
+             * Multi-layer background gradient
+             *
+             * Layer 1 (top): Purple radial gradient from top-left
+             *   - 1200px x 800px size
+             *   - Positioned at 10% from left, 20% above top
+             *   - 18% opacity purple, fading to transparent at 40%
+             *
+             * Layer 2 (middle): Cyan radial gradient from top-right
+             *   - 1000px x 700px size
+             *   - Positioned at 90% from left, 10% above top
+             *   - 18% opacity cyan, fading to transparent at 35%
+             *
+             * Layer 3 (base): Dark linear gradient
+             *   - Top to bottom: #0a1020 → #0b1220 → #0a1221
+             *   - Creates subtle depth variation
+             */
             background: radial-gradient(1200px 800px at 10% -20%, rgba(124, 58, 237, .18), transparent 40%),
             radial-gradient(1000px 700px at 90% -10%, rgba(34, 211, 238, .18), transparent 35%),
             linear-gradient(180deg, #0a1020, #0b1220 35%, #0a1221 100%);
@@ -40,7 +152,29 @@
     </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="module" src="/src/main.jsx"></script>
+    <!--
+      React Mount Point
+
+      The #root div is where the entire React application is rendered.
+      ReactDOM.createRoot() in main.jsx targets this element.
+
+      Important: This div should remain empty in the HTML.
+      React will populate it with the rendered component tree.
+    -->
+    <div id="root"></div>
+
+    <!--
+      JavaScript Entry Point
+
+      type="module": Enables ES6 module syntax (import/export)
+      src="/src/main.jsx": Points to the React application entry
+
+      Vite handles:
+      - JSX transformation
+      - Module bundling
+      - Hot Module Replacement (HMR) in development
+      - Optimized production builds
+    -->
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
